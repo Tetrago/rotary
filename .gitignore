@@ -1,0 +1,8 @@
+/.cache/
+/.vscode/
+/bazel-*/
+/third-party/*
+!/third-party/conanfile.txt
+/.dir-locals.el
+/.projectile
+/compile_commands.json
