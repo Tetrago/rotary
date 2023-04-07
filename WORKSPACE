@@ -1,4 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("//third_party:tools.bzl", "auto_github")
 
 # Compile Commands
 
@@ -22,27 +23,8 @@ http_archive(
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
 rules_foreign_cc_dependencies()
 
-# Vulkan
+# Dependencies
 
-http_archive(
-    name = "Vulkan-Headers",
-    build_file = "//third_party:Vulkan-Headers.BUILD",
-    strip_prefix = "Vulkan-Headers-63af1cf1ee906ba4dcd5a324bdd0201d4f4bfd12",
-    url = "https://github.com/KhronosGroup/Vulkan-Headers/archive/63af1cf1ee906ba4dcd5a324bdd0201d4f4bfd12.tar.gz"
-)
-
-http_archive(
-    name = "Vulkan-Loader",
-    build_file = "//third_party:Vulkan-Loader.BUILD",
-    strip_prefix = "Vulkan-Loader-8c8619df2dfb693d8ce4d5b1904a4b7694d45fbd",
-    url = "https://github.com/KhronosGroup/Vulkan-Loader/archive/8c8619df2dfb693d8ce4d5b1904a4b7694d45fbd.tar.gz"
-)
-
-# Glfw
-
-http_archive(
-    name = "glfw",
-	build_file = "//third_party:glfw.BUILD",
-    strip_prefix = "glfw-3fa2360720eeba1964df3c0ecf4b5df8648a8e52",
-	url = "https://github.com/glfw/glfw/archive/3fa2360720eeba1964df3c0ecf4b5df8648a8e52.tar.gz"
-)
+auto_github(remote = "KhronosGroup/Vulkan-Headers", commit = "63af1cf1ee906ba4dcd5a324bdd0201d4f4bfd12")
+auto_github(remote = "KhronosGroup/Vulkan-Loader", commit = "8c8619df2dfb693d8ce4d5b1904a4b7694d45fbd")
+auto_github(remote = "glfw/glfw", commit = "3fa2360720eeba1964df3c0ecf4b5df8648a8e52")
