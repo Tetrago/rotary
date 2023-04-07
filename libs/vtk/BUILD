@@ -4,7 +4,8 @@ cc_library(
     hdrs = ["include/vtk/instance.hpp"],
 	includes = ["include"],
     deps = [
-        "@rules_vulkan//vulkan:vulkan_cc_library"
+        "@Vulkan-Headers//:Vulkan-Headers",
+        "@Vulkan-Loader//:Vulkan-Loader"
     ],
 	copts = select({
         "@bazel_tools//src/conditions:windows": ["/std:c++20"],

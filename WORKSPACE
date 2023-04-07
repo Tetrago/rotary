@@ -25,13 +25,18 @@ rules_foreign_cc_dependencies()
 # Vulkan
 
 http_archive(
-    name = "rules_vulkan",
-    strip_prefix = "rules_vulkan-0.0.9",
-    url = "https://github.com/jadarve/rules_vulkan/archive/v0.0.9.tar.gz"
+    name = "Vulkan-Headers",
+    build_file = "//third_party:Vulkan-Headers.BUILD",
+    strip_prefix = "Vulkan-Headers-63af1cf1ee906ba4dcd5a324bdd0201d4f4bfd12",
+    url = "https://github.com/KhronosGroup/Vulkan-Headers/archive/63af1cf1ee906ba4dcd5a324bdd0201d4f4bfd12.tar.gz"
 )
 
-load("@rules_vulkan//vulkan:repositories.bzl", "vulkan_repositories")
-vulkan_repositories()
+http_archive(
+    name = "Vulkan-Loader",
+    build_file = "//third_party:Vulkan-Loader.BUILD",
+    strip_prefix = "Vulkan-Loader-8c8619df2dfb693d8ce4d5b1904a4b7694d45fbd",
+    url = "https://github.com/KhronosGroup/Vulkan-Loader/archive/8c8619df2dfb693d8ce4d5b1904a4b7694d45fbd.tar.gz"
+)
 
 # Glfw
 
