@@ -1,7 +1,13 @@
 cc_library(
     name = "vtk",
-    srcs = ["src/instance.cpp"],
-    hdrs = ["include/vtk/instance.hpp"],
+    srcs = [
+        "src/instance.cpp",
+        "src/physical_device.cpp"
+    ],
+    hdrs = [
+        "include/vtk/instance.hpp",
+        "include/vtk/physical_device.hpp"
+    ],
 	includes = ["include"],
     deps = [
         "@Vulkan-Headers//:Vulkan-Headers",

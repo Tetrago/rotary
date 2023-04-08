@@ -1,5 +1,5 @@
 #include <plat/window.hpp>
-#include <vtk/instance.hpp>
+#include <vtk/vtk.hpp>
 
 int main()
 {
@@ -9,6 +9,11 @@ int main()
 		.application("player", 0, 1, 0)
 		.engine("rotary", 0, 1, 0)
 		.build();
+
+	vtk::PhysicalDevice physicalDevice = vtk::PhysicalDeviceSelector(instance)
+		.requiredDiscrete()
+		.select()
+		.value();
 
 	bool running = true;
 	while(running)

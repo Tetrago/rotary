@@ -15,6 +15,8 @@ namespace vtk
 		Instance& operator=(const Instance&) = delete;
 		Instance(Instance&& other) noexcept;
 		Instance& operator=(Instance&&) = delete;
+
+		operator VkInstance() const noexcept { return mHandle; }
 	private:
 		explicit Instance(VkInstance handle) noexcept;
 
