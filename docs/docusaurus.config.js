@@ -10,14 +10,11 @@ const config = {
   tagline: '',
   favicon: 'img/favicon.ico',
 
-  // Set the production url of your site here
-  url: 'https://your-docusaurus-test-site.com',
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
-
+  url: 'https://tetrago.github.io',
+  baseUrl: '/rotary/',
   organizationName: 'tetrago',
   projectName: 'rotary',
+  trailingSlash: false,
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
