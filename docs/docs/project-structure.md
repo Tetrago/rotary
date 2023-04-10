@@ -13,7 +13,8 @@ flowchart TD
     editor([Editor])
 
     libs[Libraries]
-    engine([engine])
+    diag([Diagnostics])
+    engine([Engine])
     p2d([Physics2D])
     p3d([Physics3D])
     plat([Platform Toolkit])
@@ -24,6 +25,7 @@ flowchart TD
         bullet{{Bullet}}
         imgui{{ImGui}}
         glfw{{GLFW}}
+        spdlog{{spdlog}}
         vulkan_headers{{Vulkan-Headers}}
         vulkan_loader{{Vulkan-Loader}}
     end
@@ -31,6 +33,7 @@ flowchart TD
     rotary --- extras & libs
     extras --- player & editor
     libs --- engine
+    libs -- diag --- diag
     libs -- p2d --- p2d
     libs -- p3d --- p3d
     libs -- utk --- utk
@@ -40,16 +43,18 @@ flowchart TD
     player -.-> engine
     editor -.-> engine & utk
 
+    diag -.-> spdlog
     engine -.-> p2d & p3d & plat & vtk
     p2d -.-> bullet
     p3d -.-> bullet
     plat -.-> glfw
     utk -.-> imgui
-    vtk -.-> vulkan_headers & vulkan_loader
+    vtk -.-> diag & vulkan_headers & vulkan_loader
 
     click bullet "https://github.com/bulletphysics/bullet3" _blank
     click imgui "https://github.com/ocornut/imgui" _blank
     click glfw "https://www.glfw.org/" _blank
+    click spdlog "https://github.com/gabime/spdlog" _blank
     click vulkan_headers "https://github.com/KhronosGroup/Vulkan-Headers" _blank
     click vulkan_loader "https://github.com/KhronosGroup/Vulkan-Loader" _blank
 
@@ -62,4 +67,15 @@ flowchart TD
 
     style bullet fill:#f96
     style imgui fill:#f96
+
+    planned[[Planned]]
+    dependency[[Dependency]]
+    submodule[[Submodule]]
+
+    subgraph "Key"
+        planned --- submodule
+        planned -.-> dependency
+    end
+
+    style planned fill:#f96
 ```
