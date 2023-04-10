@@ -1,9 +1,6 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
-filegroup(
-    name = "srcs",
-    srcs = glob(["**"])
-)
+filegroup(name = "srcs", srcs = glob(["**"]))
 
 cmake(
     name = "vulkan-1",

@@ -5,13 +5,15 @@ cc_library(
         "src/physical_device.cpp"
     ],
     hdrs = [
+        "include/vtk/vtk.hpp",
         "include/vtk/instance.hpp",
         "include/vtk/physical_device.hpp"
     ],
 	includes = ["include"],
     deps = [
         "@Vulkan-Headers//:Vulkan-Headers",
-        "@Vulkan-Loader//:Vulkan-Loader"
+        "@Vulkan-Loader//:Vulkan-Loader",
+        "//libs/diag"
     ],
 	copts = select({
         "@bazel_tools//src/conditions:windows": ["/std:c++20"],

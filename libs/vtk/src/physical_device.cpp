@@ -1,6 +1,7 @@
 #include "vtk/physical_device.hpp"
 
 #include <cstdint>
+#include <diag/diag.hpp>
 
 #include "vtk/instance.hpp"
 
@@ -21,6 +22,9 @@ namespace vtk
 		vkEnumeratePhysicalDevices(instance, &count, nullptr);
 		std::vector<VkPhysicalDevice> devices(count);
 		vkEnumeratePhysicalDevices(instance, &count, devices.data());
+
+		mDevices.resize(count);
+		std::transform(devices.begin(), devices.end(), mDevices.begin(), [](const VkPhysicalDevice& device) { return read_physical_device(device); });
 	}
 
 	PhysicalDeviceSelector& PhysicalDeviceSelector::requiredDiscrete() noexcept

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+#include <span>
 #include <string_view>
 #include <vulkan/vulkan.h>
 
@@ -31,9 +33,13 @@ namespace vtk
 
 		InstanceBuilder& application(std::string_view name, int major, int minor, int patch) noexcept;
 		InstanceBuilder& engine(std::string_view name, int major, int minor, int patch) noexcept;
+		InstanceBuilder& extensions(std::span<const char* const> names) noexcept;
 
 		Instance build() const;
 	private:
 		VkApplicationInfo mAppInfo{};
+		std::vector<const char*> mExtensionNames;
 	};
+
+	std::vector<VkExtensionProperties> get_instance_extensions() noexcept;
 }

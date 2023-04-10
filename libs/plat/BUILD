@@ -1,7 +1,14 @@
 cc_library(
     name = "plat",
-    srcs = ["src/window.cpp"],
-    hdrs = ["include/plat/window.hpp"],
+    srcs = [
+        "src/extras.cpp",
+        "src/window.cpp"
+    ],
+    hdrs = [
+        "include/plat/plat.hpp",
+        "include/plat/extras.hpp",
+        "include/plat/window.hpp"
+    ],
     includes = ["include"],
     deps = [
         "@glfw//:glfw"
