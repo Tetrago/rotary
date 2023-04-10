@@ -73,7 +73,7 @@ flowchart TD
     submodule[[Submodule]]
 
     subgraph "Key"
-        planned --- submodule
+        planned -- directory --- submodule
         planned -.-> dependency
     end
 
