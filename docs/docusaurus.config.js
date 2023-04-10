@@ -40,7 +40,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/tetrago/rotary/tree/main/',
+          editUrl: 'https://github.com/tetrago/rotary/tree/develop/docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
