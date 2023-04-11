@@ -10,6 +10,7 @@ int main()
 		.application("player", 0, 1, 0)
 		.engine("rotary", 0, 1, 0)
 		.extensions(plat::get_required_instance_extensions())
+		.debug()
 		.build();
 
 	vtk::PhysicalDevice physicalDevice = [&]()
