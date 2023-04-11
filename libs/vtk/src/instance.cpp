@@ -1,5 +1,8 @@
 #include "vtk/instance.hpp"
 
+#include <algorithm>
+#include <ranges>
+#include <iterator>
 #include <optional>
 #include <stdexcept>
 #include <diag/diag.hpp>
@@ -8,22 +11,19 @@ namespace vtk
 {
 	namespace
 	{
-		std::optional<std::vector<const char*>> get_missing_extensions(std::span<VkExtensionProperties const> extensions, std::span<const char* const> names) noexcept
+		std::optional<std::vector<std::string_view>> get_missing_extensions(std::span<VkExtensionProperties const> extensions, std::span<std::string_view const> names) noexcept
 		{
-			std::vector<const char*> missing;
-			
-			for(const char* name : names)
+			std::vector<std::string_view> missing(names.begin(), names.end());
+
+			// Remove any extension names that we can find in our list
+			// This leaves any missing extensions behind
+			missing.erase(std::remove_if(missing.begin(), missing.end(), [&extensions](std::string_view name)
 			{
-				for(const VkExtensionProperties& props : extensions)
-				{
-					if(strcmp(name, props.extensionName) != 0) continue;
-					goto found;
-				}
+				// If there are no matching extensions in the list, then we want to keep the current name in the missing list
+				return !std::ranges::filter_view(extensions, [&name](const VkExtensionProperties& props){ return props.extensionName == name; }).empty();
+			}), missing.end());
 
-				missing.push_back(name);
-			found:;
-			}
-
+			// Return the missing extensions, or an empty optional
 			return missing.empty() ? std::nullopt : std::optional(missing);
 		}
 	}
@@ -64,9 +64,9 @@ namespace vtk
 		return *this;
 	}
 
-	InstanceBuilder& InstanceBuilder::extensions(std::span<const char* const> names) noexcept
+	InstanceBuilder& InstanceBuilder::extensions(std::span<std::string_view const> names) noexcept
 	{
-		mExtensionNames.insert(mExtensionNames.end(), names.begin(), names.end());
+		std::ranges::transform(names, std::back_inserter(mExtensionNames), [](std::string_view name){ return name.data(); });
 
 		return *this;
 	}
@@ -75,19 +75,27 @@ namespace vtk
 	{
 		if(auto missing = get_missing_extensions(get_instance_extensions(), mExtensionNames))
 		{
-			for(const char* name : missing.value())
+			std::ranges::for_each(missing.value(), [](std::string_view name)
 			{
-				diag::Logger::logger("vtk").error("Missing instance extension `{}`", name);
-			}
+				diag::logger("vtk").error("Missing instance extension `{}`", name);
+			});
 
 			throw std::runtime_error("Not all required instance extensions are present");
 		}
 
+		std::vector<const char*> extensions;
+		std::ranges::transform(mExtensionNames, std::back_inserter(extensions), [](std::string_view name){ return name.data(); });
+
+		std::vector<const char*> layers;
+		std::ranges::transform(mLayerNames, std::back_inserter(layers), [](std::string_view name){ return name.data(); });
+
 		VkInstanceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        createInfo.pApplicationInfo = &mAppInfo;
-		createInfo.enabledExtensionCount = mExtensionNames.size();
-		createInfo.ppEnabledExtensionNames = mExtensionNames.data();
+		createInfo.pApplicationInfo = &mAppInfo;
+		createInfo.enabledExtensionCount = extensions.size();
+		createInfo.ppEnabledExtensionNames = extensions.data();
+		createInfo.enabledLayerCount = layers.size();
+		createInfo.ppEnabledLayerNames = layers.data();
 
 		VkInstance handle;
 		if(vkCreateInstance(&createInfo, nullptr, &handle) != VK_SUCCESS)

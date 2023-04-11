@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
 #include <string>
 #include <spdlog/spdlog.h>
 
@@ -39,10 +38,9 @@ namespace diag
 		FN(warn);
 		FN(error);
 #undef FN
-
-		static const Logger& logger(const std::string& name) noexcept;
 	private:
 		std::shared_ptr<spdlog::logger> mLogger;
-		static std::unordered_map<std::string, Logger> sLogger;
 	};
+
+	const Logger& logger(const std::string& name) noexcept;
 }    

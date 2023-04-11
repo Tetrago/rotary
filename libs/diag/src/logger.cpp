@@ -1,10 +1,14 @@
 #include "diag/logger.hpp"
 
+#include <unordered_map>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace diag
 {
-	std::unordered_map<std::string, Logger> Logger::sLogger;
+	namespace
+	{
+		std::unordered_map<std::string, Logger> gLoggers;
+	}
 
 	Logger::Logger(const std::string& name) noexcept
 	{
@@ -15,14 +19,14 @@ namespace diag
 #endif
 	}
 
-	const Logger& Logger::logger(const std::string& name) noexcept
+	const Logger& logger(const std::string& name) noexcept
 	{
-		auto result = sLogger.find(name);
-		if(result == sLogger.end())
+		auto result = gLoggers.find(name);
+		if(result == gLoggers.end())
 		{
-			sLogger.emplace(name, Logger(name));
+			gLoggers.emplace(name, Logger(name));
 		}
 
-		return sLogger.at(name);
+		return gLoggers.at(name);
 	}
 }    

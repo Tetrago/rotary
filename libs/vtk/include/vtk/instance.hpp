@@ -33,12 +33,13 @@ namespace vtk
 
 		InstanceBuilder& application(std::string_view name, int major, int minor, int patch) noexcept;
 		InstanceBuilder& engine(std::string_view name, int major, int minor, int patch) noexcept;
-		InstanceBuilder& extensions(std::span<const char* const> names) noexcept;
+		InstanceBuilder& extensions(std::span<std::string_view const> names) noexcept;
 
 		Instance build() const;
 	private:
 		VkApplicationInfo mAppInfo{};
-		std::vector<const char*> mExtensionNames;
+		std::vector<std::string_view> mExtensionNames;
+		std::vector<std::string_view> mLayerNames;
 	};
 
 	std::vector<VkExtensionProperties> get_instance_extensions() noexcept;
