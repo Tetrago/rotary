@@ -26,7 +26,7 @@ namespace vtk
 			return reinterpret_cast<T>(vkGetInstanceProcAddr(mHandle, name.data()));
 		}
 	private:
-		explicit Instance(VkInstance handle, bool createMessenger);
+		explicit Instance(const InstanceBuilder& builder);
 
 		VkInstance mHandle;
 		VkDebugUtilsMessengerEXT mMessenger = VK_NULL_HANDLE;
@@ -34,6 +34,7 @@ namespace vtk
 
 	class InstanceBuilder
 	{
+		friend class Instance;
 	public:
 		InstanceBuilder() noexcept;
 

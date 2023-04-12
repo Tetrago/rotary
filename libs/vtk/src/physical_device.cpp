@@ -4,6 +4,7 @@
 #include <diag/diag.hpp>
 
 #include "vtk/instance.hpp"
+#include "vtk/logical_device.hpp"
 
 namespace vtk
 {
@@ -12,6 +13,11 @@ namespace vtk
 		PhysicalDevice device{ handle };
 		vkGetPhysicalDeviceProperties(handle, &device.properties);
 		vkGetPhysicalDeviceFeatures(handle, &device.features);
+
+		uint32_t count;
+		vkGetPhysicalDeviceQueueFamilyProperties(handle, &count, nullptr);
+		device.queueFamilies.resize(count);
+		vkGetPhysicalDeviceQueueFamilyProperties(handle, &count, device.queueFamilies.data());
 
 		return device;
 	}
@@ -29,9 +35,34 @@ namespace vtk
 
 	PhysicalDeviceSelector& PhysicalDeviceSelector::requiredDiscrete() noexcept
 	{
-		std::erase_if(mDevices, [](const PhysicalDevice& dev)
+		std::erase_if(mDevices, [](const PhysicalDevice& device)
 		{
-			return dev.properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
+			return device.properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
+		});
+
+		return *this;
+	}
+
+	PhysicalDeviceSelector& PhysicalDeviceSelector::requireGraphicsSupport() noexcept
+	{
+		return filter([](std::span<VkQueueFamilyProperties const> queueFamilies)
+		{
+			return find_queue_family(queueFamilies, QueueType::Graphics).has_value();
+		});
+	}
+
+	PhysicalDeviceSelector& PhysicalDeviceSelector::filter(const std::function<bool(const PhysicalDevice&)>& predicate) noexcept
+	{
+		std::erase_if(mDevices, std::not_fn(predicate));
+
+		return *this;
+	}
+
+	PhysicalDeviceSelector& PhysicalDeviceSelector::filter(const std::function<bool(std::span<VkQueueFamilyProperties const>)>& predicate) noexcept
+	{
+		std::erase_if(mDevices, [&predicate](const PhysicalDevice& device)
+		{
+			return !predicate(device.queueFamilies);
 		});
 
 		return *this;

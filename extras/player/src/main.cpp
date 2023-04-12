@@ -17,6 +17,7 @@ int main()
 	{
 		if(auto opt = vtk::PhysicalDeviceSelector(instance)
 		   .requiredDiscrete()
+		   .requireGraphicsSupport()
 		   .select())
 		{
 			return opt.value();
@@ -24,6 +25,10 @@ int main()
 
 		throw std::runtime_error("Could not find a suitable physical device");
 	}();
+
+	vtk::LogicalDevice logicalDevice = vtk::LogicalDeviceBuilder(physicalDevice)
+		.addGraphicsQueue()
+		.build();
 
 	bool running = true;
 	while(running)

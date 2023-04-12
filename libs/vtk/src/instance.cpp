@@ -57,26 +57,76 @@ namespace vtk
 
 			// Remove any element names that we can find in the list
 			// This leaves any missing element behind
-			missing.erase(std::get<0>(std::ranges::remove_if(missing.begin(), missing.end(), [&extensions, &getter](std::string_view name)
+			std::erase_if(missing, [&extensions, &getter](std::string_view name)
 			{
 				// If there are no matching extensions in the list, then we want to keep the current name in the missing list
 				return !std::ranges::filter_view(extensions, [&name, &getter](const T& props){ return getter(props) == name; }).empty();
-			})), missing.end());
+			});
 
 			// Return the missing element, or an empty optional
 			return missing.empty() ? std::nullopt : std::optional(missing);
 		}
 	}
 
-	Instance::Instance(VkInstance handle, bool createMessenger)
-		: mHandle(handle)
+	Instance::Instance(const InstanceBuilder& builder)
 	{
-		if(!createMessenger) return;
-		VkDebugUtilsMessengerCreateInfoEXT createInfo = get_messenger_create_info();
-
-		if(get<PFN_vkCreateDebugUtilsMessengerEXT>("vkCreateDebugUtilsMessengerEXT")(mHandle, &createInfo, nullptr, &mMessenger) != VK_SUCCESS)
+		// Check for all the requested instance extensions
+		if(auto missing = find_missing_elements<VkExtensionProperties>(get_instance_extensions(), builder.mExtensionNames, [](const VkExtensionProperties& props){ return props.extensionName; }))
 		{
-			throw std::runtime_error("Failed to create Vulkan debug messenger");
+			std::ranges::for_each(missing.value(), [](std::string_view name)
+			{
+				diag::logger("vtk").error("Missing instance extension `{}`", name);
+			});
+
+			throw std::runtime_error("Not all required instance extensions are present");
+		}
+
+		// Check for all the requested instance layers
+		if(auto missing = find_missing_elements<VkLayerProperties>(get_instance_layers(), builder.mLayerNames, [](const VkLayerProperties& props){ return props.layerName; }))
+		{
+			std::ranges::for_each(missing.value(), [](std::string_view name)
+			{
+				diag::logger("vtk").error("Missing instance layer `{}`", name);
+			});
+
+			throw std::runtime_error("Not all required instance layers are present");
+		}
+
+		std::vector<const char*> extensions;
+		std::ranges::transform(builder.mExtensionNames, std::back_inserter(extensions), [](std::string_view name){ return name.data(); }); // Convert string_views to raw C strings
+		extensions.erase(std::get<0>(std::ranges::unique(extensions)), extensions.end()); // Remove any duplicates
+
+		std::vector<const char*> layers;
+		std::ranges::transform(builder.mLayerNames, std::back_inserter(layers), [](std::string_view name){ return name.data(); }); // Convert string_views to raw C strings
+		layers.erase(std::get<0>(std::ranges::unique(layers)), layers.end()); // Remove any duplicated
+
+		VkInstanceCreateInfo createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+		createInfo.pApplicationInfo = &builder.mAppInfo;
+		createInfo.enabledExtensionCount = extensions.size();
+		createInfo.ppEnabledExtensionNames = extensions.data();
+		createInfo.enabledLayerCount = layers.size();
+		createInfo.ppEnabledLayerNames = layers.data();
+
+		VkDebugUtilsMessengerCreateInfoEXT messengerInfo = get_messenger_create_info();
+		if(builder.mDebug)
+		{
+			createInfo.pNext = &messengerInfo;
+		}
+
+		if(vkCreateInstance(&createInfo, nullptr, &mHandle) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create Vulkan instance");
+		}
+
+		if(builder.mDebug)
+		{
+			VkDebugUtilsMessengerCreateInfoEXT createInfo = get_messenger_create_info();
+
+			if(get<PFN_vkCreateDebugUtilsMessengerEXT>("vkCreateDebugUtilsMessengerEXT")(mHandle, &createInfo, nullptr, &mMessenger) != VK_SUCCESS)
+			{
+				throw std::runtime_error("Failed to create Vulkan debug messenger");
+			}
 		}
 	}
 
@@ -139,57 +189,7 @@ namespace vtk
 
 	Instance InstanceBuilder::build() const
 	{
-		// Check for all the requested instance extensions
-		if(auto missing = find_missing_elements<VkExtensionProperties>(get_instance_extensions(), mExtensionNames, [](const VkExtensionProperties& props){ return props.extensionName; }))
-		{
-			std::ranges::for_each(missing.value(), [](std::string_view name)
-			{
-				diag::logger("vtk").error("Missing instance extension `{}`", name);
-			});
-
-			throw std::runtime_error("Not all required instance extensions are present");
-		}
-
-		// Check for all the requested instance layers
-		if(auto missing = find_missing_elements<VkLayerProperties>(get_instance_layers(), mLayerNames, [](const VkLayerProperties& props){ return props.layerName; }))
-		{
-			std::ranges::for_each(missing.value(), [](std::string_view name)
-			{
-				diag::logger("vtk").error("Missing instance layer `{}`", name);
-			});
-
-			throw std::runtime_error("Not all required instance layers are present");
-		}
-
-		std::vector<const char*> extensions;
-		std::ranges::transform(mExtensionNames, std::back_inserter(extensions), [](std::string_view name){ return name.data(); }); // Convert string_views to raw C strings
-		extensions.erase(std::get<0>(std::ranges::unique(extensions)), extensions.end()); // Remove any duplicates
-
-		std::vector<const char*> layers;
-		std::ranges::transform(mLayerNames, std::back_inserter(layers), [](std::string_view name){ return name.data(); }); // Convert string_views to raw C strings
-		layers.erase(std::get<0>(std::ranges::unique(layers)), layers.end()); // Remove any duplicated
-
-		VkInstanceCreateInfo createInfo{};
-		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-		createInfo.pApplicationInfo = &mAppInfo;
-		createInfo.enabledExtensionCount = extensions.size();
-		createInfo.ppEnabledExtensionNames = extensions.data();
-		createInfo.enabledLayerCount = layers.size();
-		createInfo.ppEnabledLayerNames = layers.data();
-
-		VkDebugUtilsMessengerCreateInfoEXT messengerInfo = get_messenger_create_info();
-		if(mDebug)
-		{
-			createInfo.pNext = &messengerInfo;
-		}
-
-		VkInstance handle;
-		if(vkCreateInstance(&createInfo, nullptr, &handle) != VK_SUCCESS)
-		{
-			throw std::runtime_error("Failed to create Vulkan instance");
-		}
-
-		return Instance(handle, mDebug);
+		return Instance(*this);
 	}
 
 	std::vector<VkExtensionProperties> get_instance_extensions() noexcept

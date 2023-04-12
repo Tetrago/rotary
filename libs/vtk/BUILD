@@ -2,11 +2,13 @@ cc_library(
     name = "vtk",
     srcs = [
         "src/instance.cpp",
+        "src/logical_device.cpp",
         "src/physical_device.cpp"
     ],
     hdrs = [
         "include/vtk/vtk.hpp",
         "include/vtk/instance.hpp",
+        "include/vtk/logical_device.hpp",
         "include/vtk/physical_device.hpp"
     ],
 	includes = ["include"],
