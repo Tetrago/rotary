@@ -45,26 +45,42 @@ namespace vtk
 
 	PhysicalDeviceSelector& PhysicalDeviceSelector::requireGraphicsSupport() noexcept
 	{
-		return filter([](std::span<VkQueueFamilyProperties const> queueFamilies)
+		return filter([](const PhysicalDevice& device)
 		{
-			return find_queue_family(queueFamilies, QueueType::Graphics).has_value();
+			for(const VkQueueFamilyProperties& props : device.queueFamilies)
+			{
+				if(props.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		});
+	}
+
+	PhysicalDeviceSelector& PhysicalDeviceSelector::requirePresentSupport(VkSurfaceKHR surface) noexcept
+	{
+		return filter([&surface](const PhysicalDevice& device)
+		{
+			for(uint32_t i = 0; i < device.queueFamilies.size(); ++i)
+			{
+				VkBool32 support = false;
+				vkGetPhysicalDeviceSurfaceSupportKHR(device.handle, i, surface, &support);
+
+				if(support)
+				{
+					return true;
+				}
+			}
+
+			return false;
 		});
 	}
 
 	PhysicalDeviceSelector& PhysicalDeviceSelector::filter(const std::function<bool(const PhysicalDevice&)>& predicate) noexcept
 	{
 		std::erase_if(mDevices, std::not_fn(predicate));
-
-		return *this;
-	}
-
-	PhysicalDeviceSelector& PhysicalDeviceSelector::filter(const std::function<bool(std::span<VkQueueFamilyProperties const>)>& predicate) noexcept
-	{
-		std::erase_if(mDevices, [&predicate](const PhysicalDevice& device)
-		{
-			return !predicate(device.queueFamilies);
-		});
-
 		return *this;
 	}
 

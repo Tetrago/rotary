@@ -8,37 +8,35 @@
 
 namespace vtk
 {
-	std::optional<uint32_t> find_queue_family(std::span<VkQueueFamilyProperties const> queueFamilies, QueueType target) noexcept
-	{
-		for(uint32_t i = 0; i < queueFamilies.size(); ++i)
-		{
-			const VkQueueFamilyProperties& props = queueFamilies[i];
-
-			switch(target)
-			{
-			case QueueType::Graphics:
-				if(props.queueFlags & VK_QUEUE_GRAPHICS_BIT) return i;
-			}
-		}
-
-		return std::nullopt;
-	}
-
 	LogicalDevice::LogicalDevice(const LogicalDeviceBuilder& builder)
 	{
-		float const priority = 1.0f;
-		
+		std::unordered_map<QueueType, uint32_t> queueCreationIndices;
 		std::vector<VkDeviceQueueCreateInfo> queueInfos;
-		std::ranges::transform(builder.mQueues, std::back_inserter(queueInfos), [&priority](const std::pair<QueueType, uint32_t>& pair)
+
+		float const priority = 1.0f;
+		for(auto pair : builder.mQueues)
 		{
+			const auto& [type, index] = pair;
+
+			auto result = std::ranges::find_if(queueCreationIndices, [&pair](const std::pair<QueueType, uint32_t>& p){ return p.second == pair.second; });
+			if(result != queueCreationIndices.end())
+			{
+				queueCreationIndices[type] = result->second;
+				continue;
+			}
+			else
+			{
+				queueCreationIndices[type] = index;
+			}
+
 			VkDeviceQueueCreateInfo createInfo{};
 			createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			createInfo.queueFamilyIndex = pair.second;
+			createInfo.queueFamilyIndex = index;
 			createInfo.queueCount = 1;
 			createInfo.pQueuePriorities = &priority;
 
-			return createInfo;
-		});
+			queueInfos.push_back(createInfo);
+		};
 
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -53,7 +51,7 @@ namespace vtk
 			throw std::runtime_error("Failed to create Vulkan logical device");
 		}
 
-		for(const auto& [type, index] : builder.mQueues)
+		for(const auto& [type, index] : queueCreationIndices)
 		{
 			vkGetDeviceQueue(mHandle, index, 0, &mQueues[type]);
 		}
@@ -77,15 +75,32 @@ namespace vtk
 
 	LogicalDeviceBuilder& LogicalDeviceBuilder::addGraphicsQueue() noexcept
 	{
-		if(auto opt = find_queue_family(mDevice.queueFamilies, QueueType::Graphics))
+		for(uint32_t i = 0; i < mDevice.queueFamilies.size(); ++i)
 		{
-			mQueues[QueueType::Graphics] = opt.value();
-		}
-		else
-		{
-			diag::logger("vtk").warn("Failed to find available graphics queue in selected physical device `{}`", mDevice.properties.deviceName);
+			if(!(mDevice.queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)) continue;
+
+			mQueues[QueueType::Graphics] = i;
+			return *this;
 		}
 
+		diag::logger("vtk").warn("Failed to find available graphics queue in selected physical device `{}`", mDevice.properties.deviceName);
+		return *this;
+	}
+
+	LogicalDeviceBuilder& LogicalDeviceBuilder::addPresentQueue(VkSurfaceKHR surface) noexcept
+	{
+		for(uint32_t i = 0; i < mDevice.queueFamilies.size(); ++i)
+		{
+			VkBool32 support = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(mDevice.handle, i, surface, &support);
+
+			if(!support) continue;
+			
+			mQueues[QueueType::Present] = i;
+			return *this;
+		}
+
+		diag::logger("vtk").warn("Failed to find available present queue in selected physical device `{}`", mDevice.properties.deviceName);
 		return *this;
 	}
 

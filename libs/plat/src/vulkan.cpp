@@ -1,9 +1,12 @@
-#include "plat/extras.hpp"
+#include "plat/vulkan.hpp"
 
+#include <stdexcept>
 #include <span>
 #include <algorithm>
 #include <iterator>
 #include <ranges>
+
+#include "plat/window.hpp"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -19,5 +22,16 @@ namespace plat
 		std::ranges::transform(std::span(names, count), std::back_inserter(extensions), [](const char* name){ return name; });
 
 		return extensions;
+	}
+
+	VkSurfaceKHR create_window_surface(const Window& window, VkInstance instance)
+	{
+		VkSurfaceKHR surface;
+		if(glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create window surface");
+		}
+
+		return surface;
 	}
 }    

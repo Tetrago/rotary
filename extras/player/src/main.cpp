@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <plat/plat.hpp>
+#include <plat/vulkan.hpp>
 #include <vtk/vtk.hpp>
 
 int main()
@@ -13,11 +14,14 @@ int main()
 		.debug()
 		.build();
 
+	VkSurfaceKHR surface = plat::create_window_surface(window, instance);
+
 	vtk::PhysicalDevice physicalDevice = [&]()
 	{
 		if(auto opt = vtk::PhysicalDeviceSelector(instance)
 		   .requiredDiscrete()
 		   .requireGraphicsSupport()
+		   .requirePresentSupport(surface)
 		   .select())
 		{
 			return opt.value();
@@ -28,6 +32,7 @@ int main()
 
 	vtk::LogicalDevice logicalDevice = vtk::LogicalDeviceBuilder(physicalDevice)
 		.addGraphicsQueue()
+		.addPresentQueue(surface)
 		.build();
 
 	bool running = true;

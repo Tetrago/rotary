@@ -28,6 +28,8 @@ namespace plat
 		Window(Window&& other) noexcept;
 		Window& operator=(Window&&) = delete;
 
+		operator GLFWwindow*() const noexcept { return mHandle; }
+
 		bool poll(WindowEvent& event) noexcept;
 
 		static void update() noexcept;

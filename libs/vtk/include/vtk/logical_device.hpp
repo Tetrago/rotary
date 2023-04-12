@@ -10,10 +10,9 @@ namespace vtk
 {
 	enum class QueueType
 	{
-		Graphics
+		Graphics,
+		Present
 	};
-
-	std::optional<uint32_t> find_queue_family(std::span<VkQueueFamilyProperties const> queueFamilies, QueueType target) noexcept;
 
 	class LogicalDevice
 	{
@@ -42,6 +41,7 @@ namespace vtk
 		explicit LogicalDeviceBuilder(const PhysicalDevice& device) noexcept;
 
 		LogicalDeviceBuilder& addGraphicsQueue() noexcept;
+		LogicalDeviceBuilder& addPresentQueue(VkSurfaceKHR surface) noexcept;
 
 		LogicalDevice build() const;
 	private:
