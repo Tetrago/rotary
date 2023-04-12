@@ -52,6 +52,11 @@ namespace vtk
 		{
 			throw std::runtime_error("Failed to create Vulkan logical device");
 		}
+
+		for(const auto& [type, index] : builder.mQueues)
+		{
+			vkGetDeviceQueue(mHandle, index, 0, &mQueues[type]);
+		}
 	}
 
 	LogicalDevice::~LogicalDevice() noexcept

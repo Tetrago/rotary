@@ -25,11 +25,14 @@ namespace vtk
 		LogicalDevice& operator=(const LogicalDevice&) = delete;
 		LogicalDevice(LogicalDevice&& other) noexcept;
 		LogicalDevice& operator=(LogicalDevice&&) = delete;
+
+		VkQueue queue(QueueType type) const { return mQueues.at(type); }
 	private:
 		explicit LogicalDevice(const LogicalDeviceBuilder& builder);
 		
 		VkDevice mHandle;
 		PhysicalDevice mPhysicalDevice;
+		std::unordered_map<QueueType, VkQueue> mQueues;
 	};
 
 	class LogicalDeviceBuilder
