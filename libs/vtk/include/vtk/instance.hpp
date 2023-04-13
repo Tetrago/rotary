@@ -5,6 +5,8 @@
 #include <string_view>
 #include <vulkan/vulkan.h>
 
+#include "memory.hpp"
+
 namespace vtk
 {
 	class Instance
@@ -43,7 +45,7 @@ namespace vtk
 		InstanceBuilder& extensions(std::span<std::string_view const> names) noexcept;
 		InstanceBuilder& debug() noexcept;
 
-		Instance build() const;
+		Ref<Instance> build() const;
 	private:
 		VkApplicationInfo mAppInfo{};
 		std::vector<std::string_view> mExtensionNames;

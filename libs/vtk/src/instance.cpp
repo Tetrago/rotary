@@ -93,12 +93,14 @@ namespace vtk
 		}
 
 		std::vector<const char*> extensions;
+		extensions.reserve(builder.mExtensionNames.size());
 		std::ranges::transform(builder.mExtensionNames, std::back_inserter(extensions), [](std::string_view name){ return name.data(); }); // Convert string_views to raw C strings
 		extensions.erase(std::get<0>(std::ranges::unique(extensions)), extensions.end()); // Remove any duplicates
 
 		std::vector<const char*> layers;
+		layers.reserve(builder.mLayerNames.size());
 		std::ranges::transform(builder.mLayerNames, std::back_inserter(layers), [](std::string_view name){ return name.data(); }); // Convert string_views to raw C strings
-		layers.erase(std::get<0>(std::ranges::unique(layers)), layers.end()); // Remove any duplicated
+		layers.erase(std::get<0>(std::ranges::unique(layers)), layers.end()); // Remove any duplicates
 
 		VkInstanceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -187,9 +189,9 @@ namespace vtk
 		return *this;
 	}
 
-	Instance InstanceBuilder::build() const
+	Ref<Instance> InstanceBuilder::build() const
 	{
-		return Instance(*this);
+		return Ref<Instance>(new Instance(*this));
 	}
 
 	std::vector<VkExtensionProperties> get_instance_extensions() noexcept

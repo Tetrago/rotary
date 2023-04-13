@@ -9,6 +9,7 @@
 namespace vtk
 {
 	LogicalDevice::LogicalDevice(const LogicalDeviceBuilder& builder)
+		: mInstance(builder.mInstance)
 	{
 		std::unordered_map<QueueType, uint32_t> queueCreationIndices;
 		std::vector<VkDeviceQueueCreateInfo> queueInfos;
@@ -38,10 +39,17 @@ namespace vtk
 			queueInfos.push_back(createInfo);
 		};
 
+		std::vector<const char*> extensions;
+		extensions.reserve(builder.mExtensionNames.size());
+		std::ranges::transform(builder.mExtensionNames, std::back_inserter(extensions), [](std::string_view name){ return name.data(); });
+		extensions.erase(std::get<0>(std::ranges::unique(extensions)), extensions.end());
+
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 		createInfo.pQueueCreateInfos = queueInfos.data();
 		createInfo.queueCreateInfoCount = queueInfos.size();
+		createInfo.enabledExtensionCount = extensions.size();
+		createInfo.ppEnabledExtensionNames = extensions.data();
 
 		VkPhysicalDeviceFeatures features{};
 		createInfo.pEnabledFeatures = &features;
@@ -69,8 +77,9 @@ namespace vtk
 		other.mHandle = VK_NULL_HANDLE;
 	}
 
-	LogicalDeviceBuilder::LogicalDeviceBuilder(const PhysicalDevice& device) noexcept
-		: mDevice(device)
+	LogicalDeviceBuilder::LogicalDeviceBuilder(Ref<Instance> instance, const PhysicalDevice& device) noexcept
+		: mInstance(std::move(instance))
+		, mDevice(device)
 	{}
 
 	LogicalDeviceBuilder& LogicalDeviceBuilder::addGraphicsQueue() noexcept
@@ -104,8 +113,15 @@ namespace vtk
 		return *this;
 	}
 
-	LogicalDevice LogicalDeviceBuilder::build() const
+	LogicalDeviceBuilder& LogicalDeviceBuilder::addSwapchainSupport() noexcept
 	{
-		return LogicalDevice(*this);
+		mExtensionNames.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+
+		return *this;
+	}
+
+	Ref<LogicalDevice> LogicalDeviceBuilder::build() const
+	{
+		return Ref<LogicalDevice>(new LogicalDevice(*this));
 	}
 }    

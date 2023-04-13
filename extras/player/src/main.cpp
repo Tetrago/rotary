@@ -7,18 +7,18 @@ int main()
 {
 	plat::Window window(1024, 576, "Rotary Player");
 
-	vtk::Instance instance = vtk::InstanceBuilder()
+	vtk::Ref<vtk::Instance> instance = vtk::InstanceBuilder()
 		.application("player", 0, 1, 0)
 		.engine("rotary", 0, 1, 0)
 		.extensions(plat::get_required_instance_extensions())
 		.debug()
 		.build();
 
-	VkSurfaceKHR surface = plat::create_window_surface(window, instance);
+	VkSurfaceKHR surface = plat::create_window_surface(window, *instance);
 
 	vtk::PhysicalDevice physicalDevice = [&]()
 	{
-		if(auto opt = vtk::PhysicalDeviceSelector(instance)
+		if(auto opt = vtk::PhysicalDeviceSelector(*instance)
 		   .requiredDiscrete()
 		   .requireGraphicsSupport()
 		   .requirePresentSupport(surface)
@@ -30,9 +30,10 @@ int main()
 		throw std::runtime_error("Could not find a suitable physical device");
 	}();
 
-	vtk::LogicalDevice logicalDevice = vtk::LogicalDeviceBuilder(physicalDevice)
+	vtk::Ref<vtk::LogicalDevice> logicalDevice = vtk::LogicalDeviceBuilder(instance, physicalDevice)
 		.addGraphicsQueue()
 		.addPresentQueue(surface)
+		.addSwapchainSupport()
 		.build();
 
 	bool running = true;

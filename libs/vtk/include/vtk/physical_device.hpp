@@ -16,6 +16,7 @@ namespace vtk
 		VkPhysicalDeviceProperties properties;
 		VkPhysicalDeviceFeatures features;
 		std::vector<VkQueueFamilyProperties> queueFamilies;
+		std::vector<VkExtensionProperties> extensions;
 	};
 
 	PhysicalDevice read_physical_device(VkPhysicalDevice handle) noexcept;

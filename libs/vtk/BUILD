@@ -3,13 +3,16 @@ cc_library(
     srcs = [
         "src/instance.cpp",
         "src/logical_device.cpp",
-        "src/physical_device.cpp"
+        "src/physical_device.cpp",
+        "src/swapchain.cpp"
     ],
     hdrs = [
         "include/vtk/vtk.hpp",
         "include/vtk/instance.hpp",
         "include/vtk/logical_device.hpp",
-        "include/vtk/physical_device.hpp"
+        "include/vtk/memory.hpp",
+        "include/vtk/physical_device.hpp",
+        "include/vtk/swapchain.hpp"
     ],
 	includes = ["include"],
     deps = [

@@ -19,6 +19,10 @@ namespace vtk
 		device.queueFamilies.resize(count);
 		vkGetPhysicalDeviceQueueFamilyProperties(handle, &count, device.queueFamilies.data());
 
+		vkEnumerateDeviceExtensionProperties(handle, nullptr, &count, nullptr);
+		device.extensions.resize(count);
+		vkEnumerateDeviceExtensionProperties(handle, nullptr, &count, device.extensions.data());
+		
 		return device;
 	}
 
@@ -47,15 +51,12 @@ namespace vtk
 	{
 		return filter([](const PhysicalDevice& device)
 		{
-			for(const VkQueueFamilyProperties& props : device.queueFamilies)
-			{
-				if(props.queueFlags & VK_QUEUE_GRAPHICS_BIT)
-				{
-					return true;
-				}
-			}
-
-			return false;
+			return std::ranges::count_if(device.queueFamilies,
+										[](const VkQueueFamilyProperties& props)
+										{ return props.queueFlags & VK_QUEUE_GRAPHICS_BIT; })
+				&& std::ranges::count_if(device.extensions,
+										[](const VkExtensionProperties& props)
+										{ return strcmp(props.extensionName, VK_KHR_SWAPCHAIN_EXTENSION_NAME) == 0; });
 		});
 	}
 
