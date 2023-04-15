@@ -34,4 +34,9 @@ namespace plat
 
 		return surface;
 	}
+
+	void free_window_surface(VkInstance instance, VkSurfaceKHR surface) noexcept
+	{
+		vkDestroySurfaceKHR(instance, surface, nullptr);
+	}
 }    

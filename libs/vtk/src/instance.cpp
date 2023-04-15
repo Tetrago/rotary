@@ -134,6 +134,8 @@ namespace vtk
 
 	Instance::~Instance() noexcept
 	{
+		if(mHandle == VK_NULL_HANDLE) return;
+
 		if(mMessenger != VK_NULL_HANDLE)
 		{
 			get<PFN_vkDestroyDebugUtilsMessengerEXT>("vkDestroyDebugUtilsMessengerEXT")(mHandle, mMessenger, nullptr);
@@ -144,6 +146,7 @@ namespace vtk
 
 	Instance::Instance(Instance&& other) noexcept
 		: mHandle(other.mHandle)
+		, mMessenger(other.mMessenger)
 	{
 		other.mHandle = VK_NULL_HANDLE;
 	}

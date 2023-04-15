@@ -36,6 +36,9 @@ int main()
 		.addSwapchainSupport()
 		.build();
 
+	vtk::Ref<vtk::Swapchain> swapchain = vtk::SwapchainBuilder(logicalDevice, surface)
+		.build();
+
 	bool running = true;
 	while(running)
 	{
@@ -53,5 +56,8 @@ int main()
 		plat::Window::update();
 	}
 
-    return 0;
+	swapchain.reset();
+	plat::free_window_surface(*instance, surface);
+
+	return 0;
 }

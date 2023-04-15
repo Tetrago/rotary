@@ -30,7 +30,7 @@ namespace vtk
 	private:
 		explicit Instance(const InstanceBuilder& builder);
 
-		VkInstance mHandle;
+		VkInstance mHandle = VK_NULL_HANDLE;
 		VkDebugUtilsMessengerEXT mMessenger = VK_NULL_HANDLE;
 	};
 

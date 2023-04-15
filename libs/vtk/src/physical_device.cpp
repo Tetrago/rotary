@@ -5,6 +5,7 @@
 
 #include "vtk/instance.hpp"
 #include "vtk/logical_device.hpp"
+#include "vtk/swapchain.hpp"
 
 namespace vtk
 {
@@ -64,15 +65,16 @@ namespace vtk
 	{
 		return filter([&surface](const PhysicalDevice& device)
 		{
+			SwapchainCapabilities cap = read_swapchain_capabilities(device, surface);
+			if(cap.surfaceFormats.empty() || cap.presentModes.empty()) return false;
+			
 			for(uint32_t i = 0; i < device.queueFamilies.size(); ++i)
 			{
 				VkBool32 support = false;
 				vkGetPhysicalDeviceSurfaceSupportKHR(device.handle, i, surface, &support);
 
-				if(support)
-				{
-					return true;
-				}
+				if(!support) continue;
+				return true;
 			}
 
 			return false;

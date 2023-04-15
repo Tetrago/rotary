@@ -10,6 +10,7 @@ namespace vtk
 {
 	LogicalDevice::LogicalDevice(const LogicalDeviceBuilder& builder)
 		: mInstance(builder.mInstance)
+		, mPhysicalDevice(builder.mDevice)
 	{
 		std::unordered_map<QueueType, uint32_t> queueCreationIndices;
 		std::vector<VkDeviceQueueCreateInfo> queueInfos;
@@ -54,25 +55,29 @@ namespace vtk
 		VkPhysicalDeviceFeatures features{};
 		createInfo.pEnabledFeatures = &features;
 
-		if(vkCreateDevice(builder.mDevice.handle, &createInfo, nullptr, &mHandle) != VK_SUCCESS)
+		if(vkCreateDevice(mPhysicalDevice.handle, &createInfo, nullptr, &mHandle) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create Vulkan logical device");
 		}
 
 		for(const auto& [type, index] : queueCreationIndices)
 		{
-			vkGetDeviceQueue(mHandle, index, 0, &mQueues[type]);
+			mQueues[type].first = index;
+			vkGetDeviceQueue(mHandle, index, 0, &mQueues[type].second);
 		}
 	}
 
 	LogicalDevice::~LogicalDevice() noexcept
 	{
+		if(mHandle == VK_NULL_HANDLE) return;
 		vkDestroyDevice(mHandle, nullptr);
 	}
 	
 	LogicalDevice::LogicalDevice(LogicalDevice&& other) noexcept
-		: mHandle(other.mHandle)
+		: mInstance(std::move(other.mInstance))
+		, mHandle(other.mHandle)
 		, mPhysicalDevice(std::move(other.mPhysicalDevice))
+		, mQueues(std::move(other.mQueues))
 	{
 		other.mHandle = VK_NULL_HANDLE;
 	}

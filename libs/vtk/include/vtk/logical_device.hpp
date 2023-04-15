@@ -29,14 +29,18 @@ namespace vtk
 		LogicalDevice(LogicalDevice&& other) noexcept;
 		LogicalDevice& operator=(LogicalDevice&&) = delete;
 
-		VkQueue queue(QueueType type) const { return mQueues.at(type); }
+		operator VkDevice() const noexcept { return mHandle; }
+
+		const PhysicalDevice& physicalDevice() const noexcept { return mPhysicalDevice; }
+		VkQueue queue(QueueType type) const noexcept { return mQueues.at(type).second; }
+		uint32_t queueIndex(QueueType type) const noexcept { return mQueues.at(type).first; }
 	private:
 		LogicalDevice(const LogicalDeviceBuilder& builder);
 		
 		Ref<Instance> mInstance;
-		VkDevice mHandle;
 		PhysicalDevice mPhysicalDevice;
-		std::unordered_map<QueueType, VkQueue> mQueues;
+		VkDevice mHandle = VK_NULL_HANDLE;
+		std::unordered_map<QueueType, std::pair<uint32_t, VkQueue>> mQueues;
 	};
 
 	class LogicalDeviceBuilder
