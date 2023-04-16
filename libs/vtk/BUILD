@@ -1,18 +1,20 @@
 cc_library(
     name = "vtk",
     srcs = [
+        "src/command.cpp",
         "src/instance.cpp",
         "src/logical_device.cpp",
         "src/physical_device.cpp",
         "src/swapchain.cpp"
     ],
     hdrs = [
-        "include/vtk/vtk.hpp",
+        "include/vtk/command.hpp",
         "include/vtk/instance.hpp",
         "include/vtk/logical_device.hpp",
         "include/vtk/memory.hpp",
         "include/vtk/physical_device.hpp",
-        "include/vtk/swapchain.hpp"
+        "include/vtk/swapchain.hpp",
+        "include/vtk/vtk.hpp"
     ],
 	includes = ["include"],
     deps = [

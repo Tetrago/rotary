@@ -37,7 +37,7 @@ namespace vtk
 		VkFormat format() const noexcept { return mFormat; }
 		VkExtent2D extent() const noexcept { return mExtent; }
 	private:
-		Swapchain(const SwapchainBuilder& builder);
+		explicit Swapchain(const SwapchainBuilder& builder);
 
 		void createImageViews();
 
@@ -55,6 +55,9 @@ namespace vtk
 	public:
 		SwapchainBuilder(Ref<LogicalDevice> logicalDevice, VkSurfaceKHR surface) noexcept;
 
+		SwapchainBuilder& prefer(VkPresentModeKHR mode) noexcept;
+		SwapchainBuilder& prefer(const VkExtent2D& extent) noexcept;
+
 		Ref<Swapchain> build() const;
 	private:
 		VkSurfaceFormatKHR chooseSurfaceFormat() const noexcept;
@@ -64,5 +67,8 @@ namespace vtk
 		Ref<LogicalDevice> mLogicalDevice;
 		VkSurfaceKHR mSurface;
 		SwapchainCapabilities mCapabilities;
+		VkSurfaceFormatKHR mSurfaceFormat;
+		VkPresentModeKHR mPresentMode;
+		VkExtent2D mExtent;
 	};
 }    

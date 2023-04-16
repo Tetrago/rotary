@@ -37,6 +37,7 @@ int main()
 		.build();
 
 	vtk::Ref<vtk::Swapchain> swapchain = vtk::SwapchainBuilder(logicalDevice, surface)
+		.prefer(VK_PRESENT_MODE_FIFO_KHR)
 		.build();
 
 	bool running = true;

@@ -1,9 +1,12 @@
 #include "vtk/swapchain.hpp"
 
+#include <algorithm>
+#include <ranges>
 #include <cstdint>
 #include <stdexcept>
 #include <limits>
 #include <numeric>
+#include <diag/diag.hpp>
 
 #include "vtk/instance.hpp"
 #include "vtk/logical_device.hpp"
@@ -31,11 +34,8 @@ namespace vtk
 	Swapchain::Swapchain(const SwapchainBuilder& builder)
 		: mLogicalDevice(builder.mLogicalDevice)
 	{
-		VkSurfaceFormatKHR surfaceFormat = builder.chooseSurfaceFormat();
-		VkPresentModeKHR presentMode = builder.choosePresentMode();
-
-		mFormat = surfaceFormat.format;
-		mExtent = builder.chooseExtent();
+		mFormat = builder.mSurfaceFormat.format;
+		mExtent = builder.mExtent;
 
 		uint32_t imageCount = builder.mCapabilities.surfaceCapabilities.minImageCount + 1;
 		if(builder.mCapabilities.surfaceCapabilities.maxImageCount > 0
@@ -48,8 +48,8 @@ namespace vtk
 		createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		createInfo.surface = builder.mSurface;
 		createInfo.minImageCount = imageCount;
-		createInfo.imageFormat = surfaceFormat.format;
-		createInfo.imageColorSpace = surfaceFormat.colorSpace;
+		createInfo.imageFormat = mFormat;
+		createInfo.imageColorSpace = builder.mSurfaceFormat.colorSpace;
 		createInfo.imageExtent = mExtent;
 		createInfo.imageArrayLayers = 1;
 		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
@@ -68,7 +68,7 @@ namespace vtk
 
 		createInfo.preTransform = builder.mCapabilities.surfaceCapabilities.currentTransform;
 		createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-		createInfo.presentMode = presentMode;
+		createInfo.presentMode = builder.mPresentMode;
 		createInfo.clipped = VK_TRUE;
 
 		if(vkCreateSwapchainKHR(*mLogicalDevice, &createInfo, nullptr, &mHandle) != VK_SUCCESS)
@@ -140,7 +140,28 @@ namespace vtk
 		: mLogicalDevice(logicalDevice)
 		, mSurface(surface)
 		, mCapabilities(read_swapchain_capabilities(logicalDevice->physicalDevice(), surface))
-	{}
+	{
+		mSurfaceFormat = chooseSurfaceFormat();
+		mPresentMode = choosePresentMode();
+		mExtent = chooseExtent();
+	}
+
+	SwapchainBuilder& SwapchainBuilder::prefer(VkPresentModeKHR mode) noexcept
+	{
+		if(std::ranges::count(mCapabilities.presentModes, mode))
+		{
+			mPresentMode = mode;
+		}
+
+		diag::logger("vtk").warn("Prefered present mode could not be found for swapchain");
+		return *this;
+	}
+
+	SwapchainBuilder& SwapchainBuilder::prefer(const VkExtent2D& extent) noexcept
+	{
+		mExtent = extent;
+		return *this;
+	}
 
 	Ref<Swapchain> SwapchainBuilder::build() const
 	{

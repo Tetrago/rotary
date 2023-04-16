@@ -35,7 +35,7 @@ namespace vtk
 		VkQueue queue(QueueType type) const noexcept { return mQueues.at(type).second; }
 		uint32_t queueIndex(QueueType type) const noexcept { return mQueues.at(type).first; }
 	private:
-		LogicalDevice(const LogicalDeviceBuilder& builder);
+		explicit LogicalDevice(const LogicalDeviceBuilder& builder);
 		
 		Ref<Instance> mInstance;
 		PhysicalDevice mPhysicalDevice;
