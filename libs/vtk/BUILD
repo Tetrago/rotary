@@ -5,6 +5,7 @@ cc_library(
         "src/instance.cpp",
         "src/logical_device.cpp",
         "src/physical_device.cpp",
+        "src/render_pass.cpp",
         "src/swapchain.cpp"
     ],
     hdrs = [
@@ -14,6 +15,7 @@ cc_library(
         "include/vtk/memory.hpp",
         "include/vtk/physical_device.hpp",
         "include/vtk/swapchain.hpp",
+        "include/vtk/render_pass.hpp",
         "include/vtk/vtk.hpp"
     ],
 	includes = ["include"],

@@ -40,6 +40,12 @@ int main()
 		.prefer(VK_PRESENT_MODE_FIFO_KHR)
 		.build();
 
+	vtk::Ref<vtk::RenderPass> renderPass = vtk::RenderPassBuilder(logicalDevice)
+		.beginSubpass()
+		.addColorAttachment(swapchain->format())
+		.endSubpass()
+		.build();
+
 	bool running = true;
 	while(running)
 	{

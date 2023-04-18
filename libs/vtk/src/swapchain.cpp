@@ -152,8 +152,11 @@ namespace vtk
 		{
 			mPresentMode = mode;
 		}
+		else
+		{
+			diag::logger("vtk").warn("Prefered present mode could not be found for swapchain");
+		}
 
-		diag::logger("vtk").warn("Prefered present mode could not be found for swapchain");
 		return *this;
 	}
 
