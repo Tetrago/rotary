@@ -11,6 +11,7 @@ cc_library(
     ],
     hdrs = [
         "include/vtk/command.hpp",
+        'include/vtk/extras.hpp',
         "include/vtk/framebuffer.hpp",
         "include/vtk/instance.hpp",
         "include/vtk/logical_device.hpp",

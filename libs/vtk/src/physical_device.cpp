@@ -89,6 +89,6 @@ namespace vtk
 
 	std::optional<PhysicalDevice> PhysicalDeviceSelector::select() const noexcept
 	{
-		return mDevices.empty() ? std::nullopt : std::optional(mDevices.front());
+		return mDevices.empty() ? std::nullopt : std::make_optional(mDevices.front());
 	}
 }    

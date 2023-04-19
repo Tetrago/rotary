@@ -21,6 +21,9 @@ int main()
 			}
 		}
 
+		graphics->begin();
+		graphics->end();
+
 		plat::Window::update();
 	}
 

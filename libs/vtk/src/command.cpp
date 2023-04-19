@@ -6,12 +6,12 @@
 
 namespace vtk
 {
-	CommandPool::CommandPool(Ref<LogicalDevice> device, uint32_t index)
-		: mDevice(std::move(device))
+	CommandPool::CommandPool(const CommandPoolBuilder& builder)
+		: mDevice(builder.mDevice)
 	{
 		VkCommandPoolCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		createInfo.queueFamilyIndex = index;
+		createInfo.queueFamilyIndex = builder.mIndex;
 		createInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
 		if(vkCreateCommandPool(*mDevice, &createInfo, nullptr, &mHandle) != VK_SUCCESS)
@@ -65,5 +65,20 @@ namespace vtk
 		}
 
 		return buffers;
+	}
+
+	CommandPoolBuilder::CommandPoolBuilder(Ref<LogicalDevice> device) noexcept
+		: mDevice(std::move(device))
+	{}
+
+	CommandPoolBuilder& CommandPoolBuilder::index(uint32_t index) noexcept
+	{
+		mIndex = index;
+		return *this;
+	}
+
+	Ref<CommandPool> CommandPoolBuilder::build() const
+	{
+		return Ref<CommandPool>(new CommandPool(*this));
 	}
 }    

@@ -84,6 +84,36 @@ namespace vtk
 		other.mHandle = VK_NULL_HANDLE;
 	}
 
+	Holder<VkFence> LogicalDevice::createFence(bool signaled) const
+	{
+		VkFenceCreateInfo createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		if(signaled)
+			createInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+		VkFence handle;
+		if(vkCreateFence(mHandle, &createInfo, nullptr, &handle) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create fence");
+		}
+
+		return Holder<VkFence>(handle, [&](VkFence handle){ vkDestroyFence(mHandle, handle, nullptr); });
+	}
+
+	Holder<VkSemaphore> LogicalDevice::createSemaphore() const
+	{
+		VkSemaphoreCreateInfo createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+		VkSemaphore handle;
+		if(vkCreateSemaphore(mHandle, &createInfo, nullptr, &handle) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create semaphore");
+		}
+
+		return Holder<VkSemaphore>(handle, [&](VkSemaphore handle){ vkDestroySemaphore(mHandle, handle, nullptr); });
+	}
+
 	LogicalDeviceBuilder::LogicalDeviceBuilder(Ref<Instance> instance, const PhysicalDevice& device) noexcept
 		: mInstance(std::move(instance))
 		, mDevice(device)

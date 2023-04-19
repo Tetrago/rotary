@@ -15,6 +15,9 @@ namespace rot
 
 		VulkanGraphics(const VulkanGraphics&) = delete;
 		VulkanGraphics& operator=(const VulkanGraphics&) = delete;
+
+		void begin() override;
+		void end() override;
 	private:
 		plat::Window* mWindow;
 		vtk::Ref<vtk::Instance> mInstance;
@@ -23,5 +26,10 @@ namespace rot
 		vtk::Ref<vtk::Swapchain> mSwapchain;
 		vtk::Ref<vtk::RenderPass> mRenderPass;
 		std::vector<vtk::Ref<vtk::Framebuffer>> mFramebuffers;
+		Ref<vtk::CommandPool> mCommandPool;
+		VkCommandBuffer mCommandBuffer;
+		vtk::Holder<VkSemaphore> mPresentSemaphore;
+		vtk::Holder<VkSemaphore> mRenderSemaphore;
+		vtk::Holder<VkFence> mRenderFence;
      };
 }    
