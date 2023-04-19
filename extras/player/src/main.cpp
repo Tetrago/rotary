@@ -1,50 +1,11 @@
 #include <stdexcept>
 #include <plat/plat.hpp>
-#include <plat/vulkan.hpp>
-#include <vtk/vtk.hpp>
+#include <rotary/rotary.hpp>
 
 int main()
 {
 	plat::Window window(1024, 576, "Rotary Player");
-
-	vtk::Ref<vtk::Instance> instance = vtk::InstanceBuilder()
-		.application("player", 0, 1, 0)
-		.engine("rotary", 0, 1, 0)
-		.extensions(plat::get_required_instance_extensions())
-		.debug()
-		.build();
-
-	VkSurfaceKHR surface = plat::create_window_surface(window, *instance);
-
-	vtk::PhysicalDevice physicalDevice = [&]()
-	{
-		if(auto opt = vtk::PhysicalDeviceSelector(*instance)
-		   .requiredDiscrete()
-		   .requireGraphicsSupport()
-		   .requirePresentSupport(surface)
-		   .select())
-		{
-			return opt.value();
-		}
-
-		throw std::runtime_error("Could not find a suitable physical device");
-	}();
-
-	vtk::Ref<vtk::LogicalDevice> logicalDevice = vtk::LogicalDeviceBuilder(instance, physicalDevice)
-		.addGraphicsQueue()
-		.addPresentQueue(surface)
-		.addSwapchainSupport()
-		.build();
-
-	vtk::Ref<vtk::Swapchain> swapchain = vtk::SwapchainBuilder(logicalDevice, surface)
-		.prefer(VK_PRESENT_MODE_FIFO_KHR)
-		.build();
-
-	vtk::Ref<vtk::RenderPass> renderPass = vtk::RenderPassBuilder(logicalDevice)
-		.beginSubpass()
-		.addColorAttachment(swapchain->format())
-		.endSubpass()
-		.build();
+	rot::Ref<rot::Graphics> graphics = rot::Graphics::make(&window);
 
 	bool running = true;
 	while(running)
@@ -62,9 +23,6 @@ int main()
 
 		plat::Window::update();
 	}
-
-	swapchain.reset();
-	plat::free_window_surface(*instance, surface);
 
 	return 0;
 }

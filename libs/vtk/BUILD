@@ -2,6 +2,7 @@ cc_library(
     name = "vtk",
     srcs = [
         "src/command.cpp",
+        "src/framebuffer.cpp",
         "src/instance.cpp",
         "src/logical_device.cpp",
         "src/physical_device.cpp",
@@ -10,6 +11,7 @@ cc_library(
     ],
     hdrs = [
         "include/vtk/command.hpp",
+        "include/vtk/framebuffer.hpp",
         "include/vtk/instance.hpp",
         "include/vtk/logical_device.hpp",
         "include/vtk/memory.hpp",
@@ -18,7 +20,7 @@ cc_library(
         "include/vtk/render_pass.hpp",
         "include/vtk/vtk.hpp"
     ],
-	includes = ["include"],
+    includes = ["include"],
     deps = [
         "@Vulkan-Headers//:Vulkan-Headers",
         "@Vulkan-Loader//:Vulkan-Loader",

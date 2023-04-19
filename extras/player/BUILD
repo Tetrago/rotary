@@ -2,10 +2,10 @@ cc_binary(
     name = "player",
     srcs = ["src/main.cpp"],
     deps = [
-        "//libs/vtk",
-		"//libs/plat"
+        "//libs/plat",
+        "//libs/rotary"
     ],
-	linkopts = select({
+    linkopts = select({
         "@bazel_tools//src/conditions:windows": [
             "-DEFAULTLIB:user32.lib",
             "-DEFAULTLIB:gdi32.lib",

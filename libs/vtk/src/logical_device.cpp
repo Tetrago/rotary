@@ -70,6 +70,8 @@ namespace vtk
 	LogicalDevice::~LogicalDevice() noexcept
 	{
 		if(mHandle == VK_NULL_HANDLE) return;
+
+		vkDeviceWaitIdle(mHandle);
 		vkDestroyDevice(mHandle, nullptr);
 	}
 	

@@ -33,7 +33,7 @@ namespace vtk
 
 		operator VkSwapchainKHR() const noexcept { return mHandle; }
 
-		std::span<VkImageView const> images() const noexcept { return mImageViews; }
+		std::span<VkImageView const> views() const noexcept { return mImageViews; }
 		VkFormat format() const noexcept { return mFormat; }
 		VkExtent2D extent() const noexcept { return mExtent; }
 	private:
