@@ -18,7 +18,7 @@ flowchart TD
     p2d([Physics2D])
     p3d([Physics3D])
     plat([Platform Toolkit])
-    utk([UI Toolkit])
+    uitk([UI Toolkit])
     vtk([Vulkan Toolkit])
 
     subgraph "Third Party"
@@ -32,23 +32,23 @@ flowchart TD
 
     rotary --- extras & libs
     extras --- player & editor
-    libs --- engine
+    libs -- rotary --- engine
     libs -- diag --- diag
     libs -- p2d --- p2d
     libs -- p3d --- p3d
-    libs -- utk --- utk
+    libs -- uitk --- utk
     libs -- plat --- plat
     libs -- vtk --- vtk
 
     player -.-> engine
-    editor -.-> engine & utk
+    editor -.-> engine & uitk
 
     diag -.-> spdlog
     engine -.-> p2d & p3d & plat & vtk
     p2d -.-> bullet
     p3d -.-> bullet
     plat -.-> glfw
-    utk -.-> imgui
+    uitk -.-> imgui
     vtk -.-> diag & vulkan_headers & vulkan_loader
 
     click bullet "https://github.com/bulletphysics/bullet3" _blank
@@ -63,7 +63,7 @@ flowchart TD
     style engine fill:#f96
     style p2d fill:#f96
     style p3d fill:#f96
-    style utk fill:#f96
+    style uitk fill:#f96
 
     style bullet fill:#f96
     style imgui fill:#f96
