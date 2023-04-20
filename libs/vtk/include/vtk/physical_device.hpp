@@ -26,7 +26,7 @@ namespace vtk
 	public:
 		PhysicalDeviceSelector(const Instance& instance) noexcept;
 
-		PhysicalDeviceSelector& requiredDiscrete() noexcept;
+		PhysicalDeviceSelector& requireDiscrete() noexcept;
 		PhysicalDeviceSelector& requireGraphicsSupport() noexcept;
 		PhysicalDeviceSelector& requirePresentSupport(VkSurfaceKHR surface) noexcept;
 		PhysicalDeviceSelector& filter(const std::function<bool(const PhysicalDevice&)>& predicate) noexcept;

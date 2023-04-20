@@ -1,5 +1,6 @@
 #pragma once
 
+#include "assert.hpp"
 #include "command.hpp"
 #include "extras.hpp"
 #include "framebuffer.hpp"

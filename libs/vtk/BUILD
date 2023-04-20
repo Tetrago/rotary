@@ -10,6 +10,7 @@ cc_library(
         "src/swapchain.cpp"
     ],
     hdrs = [
+        "include/vtk/assert.hpp",
         "include/vtk/command.hpp",
         'include/vtk/extras.hpp',
         "include/vtk/framebuffer.hpp",
@@ -24,8 +25,7 @@ cc_library(
     includes = ["include"],
     deps = [
         "@Vulkan-Headers//:Vulkan-Headers",
-        "@Vulkan-Loader//:Vulkan-Loader",
-        "//libs/diag"
+        "@Vulkan-Loader//:Vulkan-Loader"
     ],
 	copts = select({
         "@bazel_tools//src/conditions:windows": ["/std:c++20"],

@@ -1,7 +1,9 @@
 #pragma once
 
+#include <functional>
 #include <vector>
 #include <span>
+#include <string>
 #include <string_view>
 #include <vulkan/vulkan.h>
 
@@ -9,6 +11,16 @@
 
 namespace vtk
 {
+	enum class Severity
+	{
+		Trace,
+		Info,
+		Warn,
+		Error
+	};
+
+	using Callback = std::function<void(Severity, const std::string&)>;
+	
 	class Instance
 	{
 		friend class InstanceBuilder;
@@ -27,11 +39,14 @@ namespace vtk
 		{
 			return reinterpret_cast<T>(vkGetInstanceProcAddr(mHandle, name.data()));
 		}
+
+		void log(Severity severity, const std::string& message) const noexcept;
 	private:
 		explicit Instance(const InstanceBuilder& builder);
 
 		VkInstance mHandle = VK_NULL_HANDLE;
 		VkDebugUtilsMessengerEXT mMessenger = VK_NULL_HANDLE;
+		Callback mCallback;
 	};
 
 	class InstanceBuilder
@@ -43,7 +58,7 @@ namespace vtk
 		InstanceBuilder& application(std::string_view name, int major, int minor, int patch) noexcept;
 		InstanceBuilder& engine(std::string_view name, int major, int minor, int patch) noexcept;
 		InstanceBuilder& extensions(std::span<std::string_view const> names) noexcept;
-		InstanceBuilder& debug() noexcept;
+		InstanceBuilder& debug(Callback callback) noexcept;
 
 		Ref<Instance> build() const;
 	private:
@@ -51,6 +66,7 @@ namespace vtk
 		std::vector<std::string_view> mExtensionNames;
 		std::vector<std::string_view> mLayerNames;
 		bool mDebug = false;
+		Callback mCallback;
 	};
 
 	std::vector<VkExtensionProperties> get_instance_extensions() noexcept;

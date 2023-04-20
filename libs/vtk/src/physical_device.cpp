@@ -1,7 +1,9 @@
 #include "vtk/physical_device.hpp"
 
+#include <iterator>
+#include <algorithm>
+#include <ranges>
 #include <cstdint>
-#include <diag/diag.hpp>
 
 #include "vtk/instance.hpp"
 #include "vtk/logical_device.hpp"
@@ -34,11 +36,11 @@ namespace vtk
 		std::vector<VkPhysicalDevice> devices(count);
 		vkEnumeratePhysicalDevices(instance, &count, devices.data());
 
-		mDevices.resize(count);
-		std::transform(devices.begin(), devices.end(), mDevices.begin(), [](const VkPhysicalDevice& device) { return read_physical_device(device); });
+		mDevices.reserve(count);
+		std::ranges::transform(devices, std::back_inserter(mDevices), [](const VkPhysicalDevice& device) { return read_physical_device(device); });
 	}
 
-	PhysicalDeviceSelector& PhysicalDeviceSelector::requiredDiscrete() noexcept
+	PhysicalDeviceSelector& PhysicalDeviceSelector::requireDiscrete() noexcept
 	{
 		std::erase_if(mDevices, [](const PhysicalDevice& device)
 		{
@@ -84,11 +86,12 @@ namespace vtk
 	PhysicalDeviceSelector& PhysicalDeviceSelector::filter(const std::function<bool(const PhysicalDevice&)>& predicate) noexcept
 	{
 		std::erase_if(mDevices, std::not_fn(predicate));
+		
 		return *this;
 	}
 
 	std::optional<PhysicalDevice> PhysicalDeviceSelector::select() const noexcept
 	{
-		return mDevices.empty() ? std::nullopt : std::make_optional(mDevices.front());
+		return mDevices.empty() ? std::nullopt : std::optional(mDevices.front());
 	}
 }    

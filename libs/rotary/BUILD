@@ -1,18 +1,20 @@
 cc_library(
     name = "rotary",
     srcs = [
+        "src/core/log.cpp",
         "src/graphics/graphics.cpp",
         "src/vulkan/graphics.cpp"
     ],
     hdrs = [
         "include/rotary/rotary.hpp",
+        "include/rotary/core/log.hpp",
         "include/rotary/core/memory.hpp",
         "include/rotary/graphics/graphics.hpp",
         "src/vulkan/graphics.hpp"
     ],
     includes = ["include"],
     deps = [
-        "//libs/diag",
+        "@spdlog//:spdlog",
         "//libs/plat",
         "//libs/vtk"
     ],

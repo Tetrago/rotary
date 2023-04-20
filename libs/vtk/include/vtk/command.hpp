@@ -23,7 +23,7 @@ namespace vtk
 		VkCommandBuffer create();
 		std::vector<VkCommandBuffer> create(int count);
 	private:
-		CommandPool(const CommandPoolBuilder& builder);
+		explicit CommandPool(const CommandPoolBuilder& builder);
 
 		Ref<LogicalDevice> mDevice;
 		VkCommandPool mHandle = VK_NULL_HANDLE;
@@ -33,7 +33,7 @@ namespace vtk
 	{
 		friend class CommandPool;
 	public:
-		CommandPoolBuilder(Ref<LogicalDevice> device) noexcept;
+		explicit CommandPoolBuilder(Ref<LogicalDevice> device) noexcept;
 
 		CommandPoolBuilder& index(uint32_t index) noexcept;
 

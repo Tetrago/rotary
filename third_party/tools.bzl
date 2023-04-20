@@ -8,3 +8,11 @@ def auto_github(remote, commit):
         strip_prefix = "%s-%s" % (repo, commit),
         url = "https://github.com/%s/archive/%s.tar.gz" % (remote, commit)
     )
+
+def from_github(remote, commit):
+    repo = remote.partition("/")[2]
+    http_archive(
+        name = repo,
+        strip_prefix = "%s-%s" % (repo, commit),
+        url = "https://github.com/%s/archive/%s.tar.gz" % (remote, commit)
+    )

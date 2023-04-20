@@ -6,7 +6,6 @@
 #include <stdexcept>
 #include <limits>
 #include <numeric>
-#include <diag/diag.hpp>
 
 #include "vtk/instance.hpp"
 #include "vtk/logical_device.hpp"
@@ -151,10 +150,6 @@ namespace vtk
 		if(std::ranges::count(mCapabilities.presentModes, mode))
 		{
 			mPresentMode = mode;
-		}
-		else
-		{
-			diag::logger("vtk").warn("Prefered present mode could not be found for swapchain");
 		}
 
 		return *this;

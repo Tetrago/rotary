@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 
+#include "vtk/assert.hpp"
 #include "vtk/logical_device.hpp"
 
 namespace vtk
@@ -50,6 +51,8 @@ namespace vtk
 
 	RenderPassBuilder& RenderPassBuilder::addColorAttachment(VkFormat format) noexcept
 	{
+		VTK_ASSERT(mSubpasses.size() != 0, "Attempting to add attachment without beginning a subpass");
+
 		VkAttachmentDescription desc{};
 		desc.format = format;
 		desc.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -72,6 +75,8 @@ namespace vtk
 
 	RenderPassBuilder& RenderPassBuilder::endSubpass() noexcept
 	{
+		VTK_ASSERT(mSubpasses.size() != 0, "Attempting to finalize subpass with no beginning");
+
 		VkSubpassDescription& desc = mSubpasses.back();
 		desc.colorAttachmentCount = mColorAttachments.size() - mColorReferenceIndex;
 		desc.pColorAttachments = mColorReferences.data() + mColorReferenceIndex;
@@ -82,6 +87,8 @@ namespace vtk
 
 	Ref<RenderPass> RenderPassBuilder::build()
 	{
+		VTK_ASSERT(mSubpasses.size() != 0, "Attempting to build RenderPass without any subpasses");
+
 		return Ref<RenderPass>(new RenderPass(*this));
 	}
 }    

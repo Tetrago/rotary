@@ -52,8 +52,8 @@ namespace vtk
 	public:
 		LogicalDeviceBuilder(Ref<Instance> instance, const PhysicalDevice& device) noexcept;
 
-		LogicalDeviceBuilder& addGraphicsQueue() noexcept;
-		LogicalDeviceBuilder& addPresentQueue(VkSurfaceKHR surface) noexcept;
+		LogicalDeviceBuilder& addGraphicsQueue();
+		LogicalDeviceBuilder& addPresentQueue(VkSurfaceKHR surface);
 		LogicalDeviceBuilder& addSwapchainSupport() noexcept;
 
 		Ref<LogicalDevice> build() const;

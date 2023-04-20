@@ -1,11 +1,13 @@
 #include "vtk/instance.hpp"
 
 #include <algorithm>
+#include <format>
 #include <ranges>
 #include <iterator>
 #include <optional>
 #include <stdexcept>
-#include <diag/diag.hpp>
+
+#include "vtk/assert.hpp"
 
 namespace vtk
 {
@@ -17,24 +19,23 @@ namespace vtk
 			const VkDebugUtilsMessengerCallbackDataEXT* pData,
 			void* pUser)
 		{
-			diag::LogLevel level = [&severity]()
+			Severity level = [&severity]()
 			{
 				switch(severity)
 				{
-				case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: return diag::LogLevel::Trace;
-				case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: return diag::LogLevel::Info;
-				case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: return diag::LogLevel::Warn;
+				case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: return Severity::Trace;
+				case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: return Severity::Info;
+				case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: return Severity::Warn;
 				default:
-				case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: return diag::LogLevel::Error;
+				case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: return Severity::Error;
 				}
 			}();
 
-			diag::logger("vtk").log(level, "[Vulkan] {}", pData->pMessage);
-
+			(*static_cast<Callback*>(pUser))(level, pData->pMessage);
 			return VK_FALSE;
 		}
 
-		VkDebugUtilsMessengerCreateInfoEXT get_messenger_create_info()
+		VkDebugUtilsMessengerCreateInfoEXT get_messenger_create_info(Callback* pCallback)
 		{
 			VkDebugUtilsMessengerCreateInfoEXT createInfo{};
 			createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -46,6 +47,7 @@ namespace vtk
 				| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
 				| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 			createInfo.pfnUserCallback = debug_callback;
+			createInfo.pUserData = pCallback;
 
 			return createInfo;
 		}
@@ -69,13 +71,14 @@ namespace vtk
 	}
 
 	Instance::Instance(const InstanceBuilder& builder)
+		: mCallback(builder.mCallback)
 	{
 		// Check for all the requested instance extensions
 		if(auto missing = find_missing_elements<VkExtensionProperties>(get_instance_extensions(), builder.mExtensionNames, [](const VkExtensionProperties& props){ return props.extensionName; }))
 		{
-			std::ranges::for_each(missing.value(), [](std::string_view name)
+			std::ranges::for_each(missing.value(), [&](std::string_view name)
 			{
-				diag::logger("vtk").error("Missing instance extension `{}`", name);
+				mCallback(Severity::Error, std::format("Missing instance extension `{}`", name));
 			});
 
 			throw std::runtime_error("Not all required instance extensions are present");
@@ -84,9 +87,9 @@ namespace vtk
 		// Check for all the requested instance layers
 		if(auto missing = find_missing_elements<VkLayerProperties>(get_instance_layers(), builder.mLayerNames, [](const VkLayerProperties& props){ return props.layerName; }))
 		{
-			std::ranges::for_each(missing.value(), [](std::string_view name)
+			std::ranges::for_each(missing.value(), [&](std::string_view name)
 			{
-				diag::logger("vtk").error("Missing instance layer `{}`", name);
+				mCallback(Severity::Error, std::format("Missing instance layer `{}`", name));
 			});
 
 			throw std::runtime_error("Not all required instance layers are present");
@@ -110,7 +113,7 @@ namespace vtk
 		createInfo.enabledLayerCount = layers.size();
 		createInfo.ppEnabledLayerNames = layers.data();
 
-		VkDebugUtilsMessengerCreateInfoEXT messengerInfo = get_messenger_create_info();
+		VkDebugUtilsMessengerCreateInfoEXT messengerInfo = get_messenger_create_info(&mCallback);
 		if(builder.mDebug)
 		{
 			createInfo.pNext = &messengerInfo;
@@ -123,7 +126,7 @@ namespace vtk
 
 		if(builder.mDebug)
 		{
-			VkDebugUtilsMessengerCreateInfoEXT createInfo = get_messenger_create_info();
+			VkDebugUtilsMessengerCreateInfoEXT createInfo = get_messenger_create_info(&mCallback);
 
 			if(get<PFN_vkCreateDebugUtilsMessengerEXT>("vkCreateDebugUtilsMessengerEXT")(mHandle, &createInfo, nullptr, &mMessenger) != VK_SUCCESS)
 			{
@@ -149,6 +152,11 @@ namespace vtk
 		, mMessenger(other.mMessenger)
 	{
 		other.mHandle = VK_NULL_HANDLE;
+	}
+
+	void Instance::log(Severity severity, const std::string& message) const noexcept
+	{
+		mCallback(severity, message);
 	}
 
 	InstanceBuilder::InstanceBuilder() noexcept
@@ -179,21 +187,24 @@ namespace vtk
 		return *this;
 	}
 
-	InstanceBuilder& InstanceBuilder::debug() noexcept
+	InstanceBuilder& InstanceBuilder::debug(Callback callback) noexcept
 	{
-		if(!mDebug)
-		{
-			mDebug = true;
-			
-			mExtensionNames.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-			mLayerNames.push_back("VK_LAYER_KHRONOS_validation");
-		}
+		VTK_ASSERT(!mDebug, "Attempting to re-mark instance as debug");
+		
+		mDebug = true;
+		mCallback = std::move(callback);
+
+		mExtensionNames.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		mLayerNames.push_back("VK_LAYER_KHRONOS_validation");
 
 		return *this;
 	}
 
 	Ref<Instance> InstanceBuilder::build() const
 	{
+		VTK_ASSERT(mAppInfo.pApplicationName, "Attempting to build unnamed instance");
+		VTK_ASSERT(mAppInfo.pEngineName, "Attempting to build unnamed instance");
+
 		return Ref<Instance>(new Instance(*this));
 	}
 

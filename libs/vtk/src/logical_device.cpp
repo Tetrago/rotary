@@ -1,10 +1,10 @@
 #include "vtk/logical_device.hpp"
 
+#include <format>
 #include <stdexcept>
 #include <iterator>
 #include <ranges>
 #include <algorithm>
-#include <diag/diag.hpp>
 
 namespace vtk
 {
@@ -97,7 +97,8 @@ namespace vtk
 			throw std::runtime_error("Failed to create fence");
 		}
 
-		return Holder<VkFence>(handle, [&](VkFence handle){ vkDestroyFence(mHandle, handle, nullptr); });
+		// LogicalDevice can only be allocated dynamically, so `this` can be safely captured
+		return Holder<VkFence>(handle, [this](VkFence handle){ vkDestroyFence(mHandle, handle, nullptr); });
 	}
 
 	Holder<VkSemaphore> LogicalDevice::createSemaphore() const
@@ -111,7 +112,8 @@ namespace vtk
 			throw std::runtime_error("Failed to create semaphore");
 		}
 
-		return Holder<VkSemaphore>(handle, [&](VkSemaphore handle){ vkDestroySemaphore(mHandle, handle, nullptr); });
+		// LogicalDevice can only be allocated dynamically, so `this` can be safely captured
+		return Holder<VkSemaphore>(handle, [this](VkSemaphore handle){ vkDestroySemaphore(mHandle, handle, nullptr); });
 	}
 
 	LogicalDeviceBuilder::LogicalDeviceBuilder(Ref<Instance> instance, const PhysicalDevice& device) noexcept
@@ -119,7 +121,7 @@ namespace vtk
 		, mDevice(device)
 	{}
 
-	LogicalDeviceBuilder& LogicalDeviceBuilder::addGraphicsQueue() noexcept
+	LogicalDeviceBuilder& LogicalDeviceBuilder::addGraphicsQueue()
 	{
 		for(uint32_t i = 0; i < mDevice.queueFamilies.size(); ++i)
 		{
@@ -129,11 +131,10 @@ namespace vtk
 			return *this;
 		}
 
-		diag::logger("vtk").warn("Failed to find available graphics queue in selected physical device `{}`", mDevice.properties.deviceName);
-		return *this;
+		throw std::runtime_error(std::format("Failed to find available graphics queue in selected physical device `{}`", mDevice.properties.deviceName));
 	}
 
-	LogicalDeviceBuilder& LogicalDeviceBuilder::addPresentQueue(VkSurfaceKHR surface) noexcept
+	LogicalDeviceBuilder& LogicalDeviceBuilder::addPresentQueue(VkSurfaceKHR surface)
 	{
 		for(uint32_t i = 0; i < mDevice.queueFamilies.size(); ++i)
 		{
@@ -146,8 +147,7 @@ namespace vtk
 			return *this;
 		}
 
-		diag::logger("vtk").warn("Failed to find available present queue in selected physical device `{}`", mDevice.properties.deviceName);
-		return *this;
+		throw std::runtime_error(std::format("Failed to find available present queue in selected physical device `{}`", mDevice.properties.deviceName));
 	}
 
 	LogicalDeviceBuilder& LogicalDeviceBuilder::addSwapchainSupport() noexcept

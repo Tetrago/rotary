@@ -1,5 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//third_party:tools.bzl", "auto_github")
+load("//third_party:tools.bzl", "auto_github", "from_github")
 
 # Compile Commands
 
@@ -29,3 +29,5 @@ auto_github(remote = "KhronosGroup/Vulkan-Headers", commit = "63af1cf1ee906ba4dc
 auto_github(remote = "KhronosGroup/Vulkan-Loader", commit = "8c8619df2dfb693d8ce4d5b1904a4b7694d45fbd")
 auto_github(remote = "glfw/glfw", commit = "3fa2360720eeba1964df3c0ecf4b5df8648a8e52")
 auto_github(remote = "gabime/spdlog", commit = "0ca574ae168820da0268b3ec7607ca7b33024d05")
+
+from_github(remote = "google/googletest", commit = "d25e625364a2078c940da2cb1fcf098aa184fd9f")

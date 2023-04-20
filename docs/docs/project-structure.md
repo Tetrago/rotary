@@ -13,7 +13,6 @@ flowchart TD
     editor([Editor])
 
     libs[Libraries]
-    diag([Diagnostics])
     engine([Engine])
     p2d([Physics2D])
     p3d([Physics3D])
@@ -33,23 +32,21 @@ flowchart TD
     rotary --- extras & libs
     extras --- player & editor
     libs -- rotary --- engine
-    libs -- diag --- diag
     libs -- p2d --- p2d
     libs -- p3d --- p3d
-    libs -- uitk --- utk
+    libs -- utk --- uitk
     libs -- plat --- plat
     libs -- vtk --- vtk
 
     player -.-> engine
     editor -.-> engine & uitk
 
-    diag -.-> spdlog
-    engine -.-> p2d & p3d & plat & vtk
+    engine -.-> p2d & p3d & plat & spdlog & vtk
     p2d -.-> bullet
     p3d -.-> bullet
     plat -.-> glfw
     uitk -.-> imgui
-    vtk -.-> diag & vulkan_headers & vulkan_loader
+    vtk -.-> vulkan_headers & vulkan_loader
 
     click bullet "https://github.com/bulletphysics/bullet3" _blank
     click imgui "https://github.com/ocornut/imgui" _blank
@@ -60,7 +57,6 @@ flowchart TD
 
     style editor fill:#f96
 
-    style engine fill:#f96
     style p2d fill:#f96
     style p3d fill:#f96
     style uitk fill:#f96

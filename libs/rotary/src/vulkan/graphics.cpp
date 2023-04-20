@@ -6,8 +6,30 @@
 #include <ranges>
 #include <plat/vulkan.hpp>
 
+#include "rotary/core/log.hpp"
+
 namespace rot
 {
+	namespace
+	{
+		void debug_callback(vtk::Severity severity, const std::string& message)
+		{
+			LogLevel level = [&severity]()
+			{
+				switch(severity)
+				{
+				case vtk::Severity::Trace: return LogLevel::Trace;
+				case vtk::Severity::Info: return LogLevel::Info;
+				case vtk::Severity::Warn: return LogLevel::Warn;
+				default:
+				case vtk::Severity::Error: return LogLevel::Error;
+				}
+			}();
+
+			logger().log(level, "[vtk] {}", message);
+		}
+	}
+
 	VulkanGraphics::VulkanGraphics(plat::Window* pWindow)
 		: mWindow(pWindow)
 	{
@@ -15,13 +37,13 @@ namespace rot
 			.application("rotary", 0, 1, 0)
 			.engine("rotary", 0, 1, 0)
 			.extensions(plat::get_required_instance_extensions())
-			.debug()
+			.debug(debug_callback)
 			.build();
 
 		mSurface = plat::create_window_surface(*mWindow, *mInstance);
 
 		auto physicalDevice = vtk::PhysicalDeviceSelector(*mInstance)
-			.requiredDiscrete()
+			.requireDiscrete()
 			.requireGraphicsSupport()
 			.requirePresentSupport(mSurface)
 			.select();
