@@ -26,7 +26,7 @@ namespace vtk
 
 		LogicalDevice(const LogicalDevice&) = delete;
 		LogicalDevice& operator=(const LogicalDevice&) = delete;
-		LogicalDevice(LogicalDevice&& other) noexcept;
+		LogicalDevice(LogicalDevice&&) = delete;
 		LogicalDevice& operator=(LogicalDevice&&) = delete;
 
 		operator VkDevice() const noexcept { return mHandle; }
@@ -42,7 +42,7 @@ namespace vtk
 		
 		Ref<Instance> mInstance;
 		PhysicalDevice mPhysicalDevice;
-		VkDevice mHandle = VK_NULL_HANDLE;
+		VkDevice mHandle;
 		std::unordered_map<QueueType, std::pair<uint32_t, VkQueue>> mQueues;
 	};
 

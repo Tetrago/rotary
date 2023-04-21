@@ -28,16 +28,7 @@ namespace vtk
 
 	Framebuffer::~Framebuffer() noexcept
 	{
-		if(mHandle == VK_NULL_HANDLE) return;
 		vkDestroyFramebuffer(*mDevice, mHandle, nullptr);
-	}
-
-	Framebuffer::Framebuffer(Framebuffer&& other) noexcept
-		: mDevice(std::move(other.mDevice))
-		, mRenderPass(std::move(other.mRenderPass))
-		, mHandle(other.mHandle)
-	{
-		other.mHandle = VK_NULL_HANDLE;
 	}
 
 	FramebufferBuilder::FramebufferBuilder(Ref<LogicalDevice> device, Ref<RenderPass> renderPass) noexcept

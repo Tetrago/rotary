@@ -137,21 +137,12 @@ namespace vtk
 
 	Instance::~Instance() noexcept
 	{
-		if(mHandle == VK_NULL_HANDLE) return;
-
 		if(mMessenger != VK_NULL_HANDLE)
 		{
 			get<PFN_vkDestroyDebugUtilsMessengerEXT>("vkDestroyDebugUtilsMessengerEXT")(mHandle, mMessenger, nullptr);
 		}
 
 		vkDestroyInstance(mHandle, nullptr);
-	}
-
-	Instance::Instance(Instance&& other) noexcept
-		: mHandle(other.mHandle)
-		, mMessenger(other.mMessenger)
-	{
-		other.mHandle = VK_NULL_HANDLE;
 	}
 
 	void Instance::log(Severity severity, const std::string& message) const noexcept

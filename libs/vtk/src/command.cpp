@@ -22,15 +22,7 @@ namespace vtk
 
 	CommandPool::~CommandPool() noexcept
 	{
-		if(mHandle == VK_NULL_HANDLE) return;
 		vkDestroyCommandPool(*mDevice, mHandle, nullptr);
-	}
-
-	CommandPool::CommandPool(CommandPool&& other) noexcept
-		: mDevice(std::move(other.mDevice))
-		, mHandle(other.mHandle)
-	{
-		other.mHandle = VK_NULL_HANDLE;
 	}
 
 	VkCommandBuffer CommandPool::create()

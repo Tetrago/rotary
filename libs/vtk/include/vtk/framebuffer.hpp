@@ -17,7 +17,7 @@ namespace vtk
 
 		Framebuffer(const Framebuffer&) = delete;
 		Framebuffer& operator=(const Framebuffer&) = delete;
-		Framebuffer(Framebuffer&& other) noexcept;
+		Framebuffer(Framebuffer&&) = delete;
 		Framebuffer& operator=(Framebuffer&&) = delete;
 
 		operator VkFramebuffer() const noexcept { return mHandle; }
@@ -26,7 +26,7 @@ namespace vtk
 		
 		Ref<LogicalDevice> mDevice;
 		Ref<RenderPass> mRenderPass;
-		VkFramebuffer mHandle = VK_NULL_HANDLE;
+		VkFramebuffer mHandle;
 	};
 
 	class FramebufferBuilder

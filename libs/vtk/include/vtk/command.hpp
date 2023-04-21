@@ -17,7 +17,7 @@ namespace vtk
 
 		CommandPool(const CommandPool&) = delete;
 		CommandPool& operator=(const CommandPool&) = delete;
-		CommandPool(CommandPool&& other) noexcept;
+		CommandPool(CommandPool&&) = delete;
 		CommandPool& operator=(CommandPool&&) = delete;
 
 		VkCommandBuffer create();
@@ -26,7 +26,7 @@ namespace vtk
 		explicit CommandPool(const CommandPoolBuilder& builder);
 
 		Ref<LogicalDevice> mDevice;
-		VkCommandPool mHandle = VK_NULL_HANDLE;
+		VkCommandPool mHandle;
 	};
 
 	class CommandPoolBuilder

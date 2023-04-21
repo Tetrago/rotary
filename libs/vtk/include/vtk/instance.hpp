@@ -29,7 +29,7 @@ namespace vtk
 
 		Instance(const Instance&) = delete;
 		Instance& operator=(const Instance&) = delete;
-		Instance(Instance&& other) noexcept;
+		Instance(Instance&&) = delete;
 		Instance& operator=(Instance&&) = delete;
 
 		operator VkInstance() const noexcept { return mHandle; }
@@ -44,7 +44,7 @@ namespace vtk
 	private:
 		explicit Instance(const InstanceBuilder& builder);
 
-		VkInstance mHandle = VK_NULL_HANDLE;
+		VkInstance mHandle;
 		VkDebugUtilsMessengerEXT mMessenger = VK_NULL_HANDLE;
 		Callback mCallback;
 	};

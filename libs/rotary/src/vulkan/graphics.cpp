@@ -106,16 +106,10 @@ namespace rot
 
 	void VulkanGraphics::begin()
 	{
-		
-	}
-
-	void VulkanGraphics::end()
-	{
 		vtk::wait(mDevice, mRenderFence);
 		vtk::reset(mDevice, mRenderFence);
 
-		uint32_t imageIndex;
-		if(vkAcquireNextImageKHR(*mDevice, *mSwapchain, std::numeric_limits<uint64_t>::max(), mPresentSemaphore, nullptr, &imageIndex) != VK_SUCCESS)
+		if(vkAcquireNextImageKHR(*mDevice, *mSwapchain, std::numeric_limits<uint64_t>::max(), mPresentSemaphore, nullptr, &mImageIndex) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to acquire next swapchain image");
 		}
@@ -127,13 +121,17 @@ namespace rot
 		beginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		beginInfo.renderPass = *mRenderPass;
 		beginInfo.renderArea.extent = mSwapchain->extent();
-		beginInfo.framebuffer = *mFramebuffers[imageIndex];
+		beginInfo.framebuffer = *mFramebuffers[mImageIndex];
 
 		static const VkClearValue clearValue{};
 		beginInfo.clearValueCount = 1;
 		beginInfo.pClearValues = &clearValue;
 
 		vkCmdBeginRenderPass(mCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+	}
+
+	void VulkanGraphics::end()
+	{
 		vkCmdEndRenderPass(mCommandBuffer);
 
 		vtk::end(mCommandBuffer);
@@ -163,7 +161,7 @@ namespace rot
 		presentInfo.pSwapchains = &handle;
 		presentInfo.waitSemaphoreCount = 1;
 		presentInfo.pWaitSemaphores = mRenderSemaphore;
-		presentInfo.pImageIndices = &imageIndex;
+		presentInfo.pImageIndices = &mImageIndex;
 
 		if(vkQueuePresentKHR(mDevice->queue(vtk::QueueType::Graphics), &presentInfo) != VK_SUCCESS)
 		{

@@ -17,7 +17,7 @@ namespace vtk
 
 		RenderPass(const RenderPass&) = delete;
 		RenderPass& operator=(const RenderPass&) = delete;
-		RenderPass(RenderPass&& other) noexcept;
+		RenderPass(RenderPass&&) = delete;
 		RenderPass& operator=(RenderPass&&) = delete;
 
 		operator VkRenderPass() const noexcept { return mHandle; }
@@ -25,7 +25,7 @@ namespace vtk
 		RenderPass(const RenderPassBuilder& builder);
 
 		Ref<LogicalDevice> mDevice;
-		VkRenderPass mHandle = VK_NULL_HANDLE;
+		VkRenderPass mHandle;
 	};
 
 	class RenderPassBuilder

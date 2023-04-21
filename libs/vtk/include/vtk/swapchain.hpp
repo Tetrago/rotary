@@ -28,7 +28,7 @@ namespace vtk
 
 		Swapchain(const Swapchain&) = delete;
 		Swapchain& operator=(const Swapchain&) = delete;
-		Swapchain(Swapchain&& other) noexcept;
+		Swapchain(Swapchain&&) = delete;
 		Swapchain& operator=(Swapchain&&) = delete;
 
 		operator VkSwapchainKHR() const noexcept { return mHandle; }

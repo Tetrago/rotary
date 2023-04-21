@@ -25,15 +25,7 @@ namespace vtk
 
 	RenderPass::~RenderPass() noexcept
 	{
-		if(mHandle == VK_NULL_HANDLE) return;
 		vkDestroyRenderPass(*mDevice, mHandle, nullptr);
-	}
-
-	RenderPass::RenderPass(RenderPass&& other) noexcept
-		: mDevice(std::move(other.mDevice))
-		, mHandle(other.mHandle)
-	{
-		other.mHandle = VK_NULL_HANDLE;
 	}
 
 	RenderPassBuilder::RenderPassBuilder(Ref<LogicalDevice> device) noexcept

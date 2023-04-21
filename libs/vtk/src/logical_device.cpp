@@ -69,19 +69,8 @@ namespace vtk
 
 	LogicalDevice::~LogicalDevice() noexcept
 	{
-		if(mHandle == VK_NULL_HANDLE) return;
-
 		vkDeviceWaitIdle(mHandle);
 		vkDestroyDevice(mHandle, nullptr);
-	}
-	
-	LogicalDevice::LogicalDevice(LogicalDevice&& other) noexcept
-		: mInstance(std::move(other.mInstance))
-		, mHandle(other.mHandle)
-		, mPhysicalDevice(std::move(other.mPhysicalDevice))
-		, mQueues(std::move(other.mQueues))
-	{
-		other.mHandle = VK_NULL_HANDLE;
 	}
 
 	Holder<VkFence> LogicalDevice::createFence(bool signaled) const

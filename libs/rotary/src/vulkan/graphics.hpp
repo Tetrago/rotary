@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <vector>
 #include <vtk/vtk.hpp>
 
@@ -31,5 +32,6 @@ namespace rot
 		vtk::Holder<VkSemaphore> mPresentSemaphore;
 		vtk::Holder<VkSemaphore> mRenderSemaphore;
 		vtk::Holder<VkFence> mRenderFence;
+		uint32_t mImageIndex;
      };
 }    

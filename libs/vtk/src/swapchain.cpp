@@ -84,25 +84,12 @@ namespace vtk
 
 	Swapchain::~Swapchain() noexcept
 	{
-		if(mHandle == VK_NULL_HANDLE) return;
-
 		for(VkImageView view : mImageViews)
 		{
 			vkDestroyImageView(*mLogicalDevice, view, nullptr);
 		}
 
 		vkDestroySwapchainKHR(*mLogicalDevice, mHandle, nullptr);
-	}
-
-	Swapchain::Swapchain(Swapchain&& other) noexcept
-		: mLogicalDevice(std::move(other.mLogicalDevice))
-		, mHandle(other.mHandle)
-		, mFormat(other.mFormat)
-		, mExtent(other.mExtent)
-		, mImages(std::move(other.mImages))
-		, mImageViews(std::move(other.mImageViews))
-	{
-		other.mHandle = VK_NULL_HANDLE;
 	}
 
 	void Swapchain::createImageViews()
