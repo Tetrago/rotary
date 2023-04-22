@@ -1,6 +1,8 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
+#include <memory>
 #include <spdlog/spdlog.h>
 
 namespace rot
@@ -15,12 +17,11 @@ namespace rot
 
 	class Logger
 	{
+		friend class LoggerBuilder;
 	public:
-		explicit Logger(const std::string& name) noexcept;
-
 		Logger(const Logger&) = delete;
 		Logger& operator=(const Logger&) = delete;
-		Logger(Logger&& other) noexcept;
+		Logger(Logger&& other) noexcept = default;
 		Logger& operator=(Logger&&) = delete;
 
 		template<typename... Args>
@@ -37,7 +38,24 @@ namespace rot
 		FN(error);
 #undef FN
 	private:
+		explicit Logger(std::shared_ptr<spdlog::logger>&& logger) noexcept;
+
 		std::shared_ptr<spdlog::logger> mLogger;
+	};
+
+	class LoggerBuilder
+	{
+		friend class Logger;
+	public:
+		LoggerBuilder(const std::string& name) noexcept;
+
+		LoggerBuilder& out() noexcept;
+		LoggerBuilder& file(const std::filesystem::path& path) noexcept;
+
+		Logger build() const noexcept;
+	private:
+		std::string mName;
+		std::vector<spdlog::sink_ptr> mSinks;
 	};
 
 	const Logger& logger() noexcept;

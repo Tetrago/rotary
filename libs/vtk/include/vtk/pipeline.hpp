@@ -48,7 +48,7 @@ namespace vtk
 		PipelineBuilder& scissor(const VkRect2D& scissor) noexcept;
 		PipelineBuilder& scissor(const VkExtent2D& extent) noexcept;
 
-		Ref<Pipeline> build();
+		Ref<Pipeline> build() const;
 	private:
 		Ref<LogicalDevice> mDevice;
 		Ref<RenderPass> mRenderPass;

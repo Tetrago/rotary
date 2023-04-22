@@ -38,5 +38,6 @@ namespace rot
 		vtk::Holder<VkSemaphore> mRenderSemaphore;
 		vtk::Holder<VkFence> mRenderFence;
 		uint32_t mImageIndex;
+		std::vector<Ref<Shader>> mShaders;
      };
 }    

@@ -58,11 +58,17 @@ namespace vtk
 		{
 			throw std::runtime_error("Failed to create graphics pipeline");
 		}
+
+		for(VkShaderModule module : modules)
+		{
+			vkDestroyShaderModule(*mDevice, module, nullptr);
+		}
 	}
 
 	Pipeline::~Pipeline() noexcept
 	{
-
+		vkDestroyPipeline(*mDevice, mHandle, nullptr);
+		vkDestroyPipelineLayout(*mDevice, mLayout, nullptr);
 	}
 
 	PipelineBuilder::PipelineBuilder(Ref<LogicalDevice> device, Ref<RenderPass> renderPass) noexcept
@@ -175,7 +181,7 @@ namespace vtk
 		return *this;
 	}
 
-	Ref<Pipeline> PipelineBuilder::build()
+	Ref<Pipeline> PipelineBuilder::build() const
 	{
 		VTK_ASSERT(mModules.size() != 0, "Attempting to create pipeline without any modules");
 

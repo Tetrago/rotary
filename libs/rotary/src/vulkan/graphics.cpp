@@ -30,7 +30,14 @@ namespace rot
 				}
 			}();
 
-			logger().log(level, "[vtk] {}", message);
+			static Logger logger = LoggerBuilder("vtk")
+#ifndef NDEBUG
+				.out()
+#endif
+				.file("vtk.log")
+				.build();
+
+			logger.log(level, "{}", message);
 		}
 	}
 
@@ -94,7 +101,9 @@ namespace rot
 
 	VulkanGraphics::~VulkanGraphics() noexcept
 	{
-		vkDeviceWaitIdle(*mDevice);
+		vtk::wait(*mDevice, mRenderFence);
+
+		mShaders.clear();
 
 		mRenderFence.reset();
 		mRenderSemaphore.reset();
@@ -138,7 +147,7 @@ namespace rot
 			.scissor(mSwapchain->extent())
 			.build();
 
-		return make_ref<VulkanShader>(std::move(pipeline));
+		return mShaders.emplace_back(make_ref<VulkanShader>(std::move(pipeline)));
 	}
 
 	void VulkanGraphics::begin()

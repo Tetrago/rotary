@@ -1,25 +1,46 @@
 #include "rotary/core/log.hpp"
 
+#include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace rot
 {
-	Logger::Logger(const std::string& name) noexcept
+	Logger::Logger(std::shared_ptr<spdlog::logger>&& logger) noexcept
+		: mLogger(std::move(logger))
 	{
-		mLogger = spdlog::stdout_color_mt(name);
-
 #ifndef NDEBUG
 		mLogger->set_level(spdlog::level::trace);
 #endif
 	}
 
-	Logger::Logger(Logger&& other) noexcept
-		: mLogger(std::move(other.mLogger))
-	{}
-
 	const Logger& logger() noexcept
 	{
-		static Logger logger("rotary");
+		static Logger logger = LoggerBuilder("rotary").out().build();
 		return logger;
+	}
+
+	LoggerBuilder::LoggerBuilder(const std::string& name) noexcept
+		: mName(name)
+	{}
+
+	LoggerBuilder& LoggerBuilder::out() noexcept
+	{
+		mSinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+		mSinks.back()->set_pattern("[%H:%M:%S.%e] [%n] [%l] %v");
+
+		return *this;
+	}
+
+	LoggerBuilder& LoggerBuilder::file(const std::filesystem::path& path) noexcept
+	{
+		mSinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(path.string(), true));
+		mSinks.back()->set_pattern("[%H:%M:%S.%e] [%l] %v");
+
+		return *this;
+	}
+
+	Logger LoggerBuilder::build() const noexcept
+	{
+		return Logger(std::make_shared<spdlog::logger>(mName, mSinks.begin(), mSinks.end()));
 	}
 }    
