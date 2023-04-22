@@ -17,8 +17,13 @@ namespace rot
 		VulkanGraphics(const VulkanGraphics&) = delete;
 		VulkanGraphics& operator=(const VulkanGraphics&) = delete;
 
+		Ref<Shader> createShader(const std::filesystem::path& vertex, const std::filesystem::path& fragment) override;
+
 		void begin() override;
 		void end() override;
+
+		void bind(const Shader& shader) override;
+		void draw(uint32_t count, uint32_t offset) override;
 	private:
 		plat::Window* mWindow;
 		vtk::Ref<vtk::Instance> mInstance;

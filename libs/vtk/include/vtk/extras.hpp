@@ -7,14 +7,14 @@
 
 namespace vtk
 {
-	inline void wait(const Ref<LogicalDevice>& device, const Holder<VkFence>& fence) noexcept
+	inline void wait(const LogicalDevice& device, VkFence fence) noexcept
 	{
-		vkWaitForFences(*device, 1, fence, true, std::numeric_limits<uint64_t>::max());
+		vkWaitForFences(device, 1, &fence, true, std::numeric_limits<uint64_t>::max());
 	}
 
-	inline void reset(const Ref<LogicalDevice>& device, const Holder<VkFence>& fence) noexcept
+	inline void reset(const LogicalDevice& device, VkFence fence) noexcept
 	{
-		vkResetFences(*device, 1, fence);
+		vkResetFences(device, 1, &fence);
 	}
 
 	inline void reset(VkCommandBuffer buffer) noexcept

@@ -5,4 +5,4 @@ add_executable(player
 	"src/main.cpp"
 )
 
-target_link_libraries(player plat rotary)
+target_link_libraries(player plat rotary vtk)

@@ -1,12 +1,16 @@
 #include "graphics.hpp"
 
+#include <fstream>
 #include <stdexcept>
 #include <algorithm>
 #include <iterator>
 #include <ranges>
 #include <plat/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
 
 #include "rotary/core/log.hpp"
+#include "rotary/core/memory.hpp"
+#include "shader.hpp"
 
 namespace rot
 {
@@ -104,10 +108,43 @@ namespace rot
 		plat::free_window_surface(*mInstance, mSurface);
 	}
 
+	Ref<Shader> VulkanGraphics::createShader(const std::filesystem::path& vertex, const std::filesystem::path& fragment)
+	{
+		auto load = [](const std::filesystem::path& path)
+		{
+			std::ifstream file(path, std::ios::ate | std::ios::binary);
+			if(!file.is_open())
+			{
+				logger().error("Could not find shader file `{}`", path.string());
+				throw std::runtime_error("Could not load file");
+			}
+
+			size_t size = file.tellg();
+			file.seekg(0, std::ios::beg);
+
+			std::vector<uint8_t> data(size);
+			file.read(reinterpret_cast<char*>(data.data()), size);
+
+			return data;
+		};
+
+		auto vcode = load(vertex);
+		auto fcode = load(fragment);
+
+		vtk::Ref<vtk::Pipeline> pipeline = vtk::PipelineBuilder(mDevice, mRenderPass)
+			.add(VK_SHADER_STAGE_VERTEX_BIT, vcode)
+			.add(VK_SHADER_STAGE_FRAGMENT_BIT, fcode)
+			.viewport(mSwapchain->extent())
+			.scissor(mSwapchain->extent())
+			.build();
+
+		return make_ref<VulkanShader>(std::move(pipeline));
+	}
+
 	void VulkanGraphics::begin()
 	{
-		vtk::wait(mDevice, mRenderFence);
-		vtk::reset(mDevice, mRenderFence);
+		vtk::wait(*mDevice, mRenderFence);
+		vtk::reset(*mDevice, mRenderFence);
 
 		if(vkAcquireNextImageKHR(*mDevice, *mSwapchain, std::numeric_limits<uint64_t>::max(), mPresentSemaphore, nullptr, &mImageIndex) != VK_SUCCESS)
 		{
@@ -167,5 +204,15 @@ namespace rot
 		{
 			throw std::runtime_error("Failed to present to swapchain");
 		}
+	}
+
+	void VulkanGraphics::bind(const Shader& shader)
+	{
+		vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, static_cast<const VulkanShader&>(shader).pipeline());
+	}
+
+	void VulkanGraphics::draw(uint32_t count, uint32_t offset)
+	{
+		vkCmdDraw(mCommandBuffer, count, 1, offset, 0);
 	}
 }    
