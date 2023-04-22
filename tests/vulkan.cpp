@@ -9,7 +9,7 @@
 #include <plat/vulkan.hpp>
 #include <vtk/vtk.hpp>
 
-TEST(Graphics, Lifecycle)
+TEST(Vulkan, Lifecycle)
 {
 	bool fail = false;
 	auto callback = [&fail](vtk::Severity severity, const std::string& message)
