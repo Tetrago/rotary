@@ -10,6 +10,7 @@
 
 #include "rotary/core/log.hpp"
 #include "rotary/core/memory.hpp"
+#include "mesh.hpp"
 #include "shader.hpp"
 
 namespace rot
@@ -103,6 +104,7 @@ namespace rot
 	{
 		vtk::wait(*mDevice, mRenderFence);
 
+		mMeshes.clear();
 		mShaders.clear();
 
 		mRenderFence.reset();
@@ -115,6 +117,11 @@ namespace rot
 		mDevice.reset();
 		
 		plat::free_window_surface(*mInstance, mSurface);
+	}
+
+	Ref<Mesh> VulkanGraphics::createMesh(const void* pData, size_t size)
+	{
+		return mMeshes.emplace_back(make_ref<VulkanMesh>(mDevice, pData, size));
 	}
 
 	Ref<Shader> VulkanGraphics::createShader(const std::filesystem::path& vertex, const std::filesystem::path& fragment)
@@ -145,6 +152,9 @@ namespace rot
 			.add(VK_SHADER_STAGE_FRAGMENT_BIT, fcode)
 			.viewport(mSwapchain->extent())
 			.scissor(mSwapchain->extent())
+			.begin()
+			.input(VK_FORMAT_R32G32B32_SFLOAT, 0)
+			.end(3 * sizeof(float))
 			.build();
 
 		return mShaders.emplace_back(make_ref<VulkanShader>(std::move(pipeline)));
@@ -213,6 +223,12 @@ namespace rot
 		{
 			throw std::runtime_error("Failed to present to swapchain");
 		}
+	}
+
+	void VulkanGraphics::bind(const Mesh& mesh)
+	{
+		VkDeviceSize offset = 0;
+		vkCmdBindVertexBuffers(mCommandBuffer, 0, 1, static_cast<const VulkanMesh&>(mesh).buffer().handle(), &offset);
 	}
 
 	void VulkanGraphics::bind(const Shader& shader)

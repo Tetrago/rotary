@@ -6,6 +6,8 @@
 #include <ranges>
 #include <algorithm>
 
+#include "allocator.hpp"
+
 namespace vtk
 {
 	LogicalDevice::LogicalDevice(const LogicalDeviceBuilder& builder)
@@ -65,11 +67,15 @@ namespace vtk
 			mQueues[type].first = index;
 			vkGetDeviceQueue(mHandle, index, 0, &mQueues[type].second);
 		}
+
+		mAllocator = Ref<Allocator>(new Allocator(this));
 	}
 
 	LogicalDevice::~LogicalDevice() noexcept
 	{
 		vkDeviceWaitIdle(mHandle);
+
+		mAllocator.reset();
 		vkDestroyDevice(mHandle, nullptr);
 	}
 

@@ -39,11 +39,18 @@ namespace vtk
 			throw std::runtime_error("Failed to create pipeline layout");
 		}
 
+		VkPipelineVertexInputStateCreateInfo inputState{};
+		inputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		inputState.vertexAttributeDescriptionCount = builder.mInputAttributes.size();
+		inputState.pVertexAttributeDescriptions = builder.mInputAttributes.data();
+		inputState.vertexBindingDescriptionCount = builder.mInputBindings.size();
+		inputState.pVertexBindingDescriptions = builder.mInputBindings.data();
+
 		VkGraphicsPipelineCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		createInfo.stageCount = stages.size();
 		createInfo.pStages = stages.data();
-		createInfo.pVertexInputState = &builder.mInputState;
+		createInfo.pVertexInputState = &inputState;
 		createInfo.pInputAssemblyState = &builder.mAssemblyState;
 		createInfo.pViewportState = &builder.mViewportState;
 		createInfo.pRasterizationState = &builder.mRasterizationState;
@@ -75,8 +82,6 @@ namespace vtk
 		: mDevice(std::move(device))
 		, mRenderPass(std::move(renderPass))
 	{
-		mInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-
 		mAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		mAssemblyState.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		mAssemblyState.primitiveRestartEnable = VK_FALSE;
@@ -129,6 +134,41 @@ namespace vtk
 		createInfo.pName = "main";
 
 		mStages.push_back(createInfo);
+
+		return *this;
+	}
+
+	PipelineBuilder& PipelineBuilder::begin() noexcept
+	{
+		VkVertexInputBindingDescription binding{};
+		binding.binding = mInputBindings.size();
+		binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+		mInputBindings.push_back(binding);
+
+		return *this;
+	}
+
+	PipelineBuilder& PipelineBuilder::input(VkFormat format, uint32_t offset) noexcept
+	{
+		VTK_ASSERT(mInputBindings.size() > 0, "Attempting to add input without a binding");
+
+		VkVertexInputAttributeDescription input{};
+		input.binding = mInputBindings.size() - 1;
+		input.location = mInputAttributes.size() - mAttributeIndex;
+		input.format = format;
+		input.offset = offset;
+
+		mInputAttributes.push_back(input);
+		return *this;
+	}
+
+	PipelineBuilder& PipelineBuilder::end(size_t size) noexcept
+	{
+		VTK_ASSERT(mInputBindings.size() > 0, "Attempting to end binding without a beginning");
+
+		mInputBindings.back().stride = size;
+		mAttributeIndex = mInputAttributes.size();
 
 		return *this;
 	}

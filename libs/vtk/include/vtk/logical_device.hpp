@@ -10,6 +10,7 @@
 
 namespace vtk
 {
+	class Allocator;
 	class Instance;
 
 	enum class QueueType
@@ -26,17 +27,17 @@ namespace vtk
 
 		LogicalDevice(const LogicalDevice&) = delete;
 		LogicalDevice& operator=(const LogicalDevice&) = delete;
-		LogicalDevice(LogicalDevice&&) = delete;
-		LogicalDevice& operator=(LogicalDevice&&) = delete;
 
 		operator VkDevice() const noexcept { return mHandle; }
 
 		Holder<VkFence> createFence(bool signaled = false) const;
 		Holder<VkSemaphore> createSemaphore() const;
 
+		const Instance& instance() const noexcept { return *mInstance; }
 		const PhysicalDevice& physicalDevice() const noexcept { return mPhysicalDevice; }
 		VkQueue queue(QueueType type) const noexcept { return mQueues.at(type).second; }
 		uint32_t queueIndex(QueueType type) const noexcept { return mQueues.at(type).first; }
+		const Allocator& allocator() const noexcept { return *mAllocator; }
 	private:
 		explicit LogicalDevice(const LogicalDeviceBuilder& builder);
 		
@@ -44,6 +45,7 @@ namespace vtk
 		PhysicalDevice mPhysicalDevice;
 		VkDevice mHandle;
 		std::unordered_map<QueueType, std::pair<uint32_t, VkQueue>> mQueues;
+		Ref<Allocator> mAllocator;
 	};
 
 	class LogicalDeviceBuilder

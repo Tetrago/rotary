@@ -17,12 +17,15 @@ namespace rot
 		VulkanGraphics(const VulkanGraphics&) = delete;
 		VulkanGraphics& operator=(const VulkanGraphics&) = delete;
 
+		Ref<Mesh> createMesh(const void* pData, size_t size) override;
 		Ref<Shader> createShader(const std::filesystem::path& vertex, const std::filesystem::path& fragment) override;
 
 		void begin() override;
 		void end() override;
 
+		void bind(const Mesh& mesh) override;
 		void bind(const Shader& shader) override;
+
 		void draw(uint32_t count, uint32_t offset) override;
 	private:
 		plat::Window* mWindow;
@@ -38,6 +41,7 @@ namespace rot
 		vtk::Holder<VkSemaphore> mRenderSemaphore;
 		vtk::Holder<VkFence> mRenderFence;
 		uint32_t mImageIndex;
+		std::vector<Ref<Mesh>> mMeshes;
 		std::vector<Ref<Shader>> mShaders;
      };
 }    

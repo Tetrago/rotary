@@ -5,6 +5,7 @@ find_package(glfw3)
 find_package(GTest)
 find_package(spdlog)
 find_package(Vulkan)
+find_package(unofficial-vulkan-memory-allocator)
 
 option(ROTARY_VULKAN "" ON)
 

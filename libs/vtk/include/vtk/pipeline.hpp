@@ -4,7 +4,6 @@
 #include <span>
 #include <vector>
 #include <vulkan/vulkan.h>
-#include <vulkan/vulkan_core.h>
 
 #include "memory.hpp"
 
@@ -21,12 +20,10 @@ namespace vtk
 
 		Pipeline(const Pipeline&) = delete;
 		Pipeline& operator=(const Pipeline&) = delete;
-		Pipeline(Pipeline&&) = delete;
-		Pipeline& operator=(Pipeline&&) = delete;
 
 		operator VkPipeline() const noexcept { return mHandle; }
 	private:
-		Pipeline(const PipelineBuilder& builder);
+		explicit Pipeline(const PipelineBuilder& builder);
 
 		Ref<LogicalDevice> mDevice;
 		Ref<RenderPass> mRenderPass;
@@ -41,6 +38,9 @@ namespace vtk
 		PipelineBuilder(Ref<LogicalDevice> device, Ref<RenderPass> renderPass) noexcept;
 
 		PipelineBuilder& add(VkShaderStageFlagBits stage, std::span<uint8_t const> code) noexcept;
+		PipelineBuilder& begin() noexcept;
+		PipelineBuilder& input(VkFormat format, uint32_t offset) noexcept;
+		PipelineBuilder& end(size_t size) noexcept;
 		PipelineBuilder& topology(VkPrimitiveTopology topology) noexcept;
 		PipelineBuilder& polygonMode(VkPolygonMode mode) noexcept;
 		PipelineBuilder& viewport(const VkViewport& viewport) noexcept;
@@ -54,7 +54,9 @@ namespace vtk
 		Ref<RenderPass> mRenderPass;
 		std::vector<std::span<uint8_t const>> mModules;
 		std::vector<VkPipelineShaderStageCreateInfo> mStages;
-		VkPipelineVertexInputStateCreateInfo mInputState{};
+		std::vector<VkVertexInputBindingDescription> mInputBindings;
+		std::vector<VkVertexInputAttributeDescription> mInputAttributes;
+		int mAttributeIndex = 0;
 		VkPipelineInputAssemblyStateCreateInfo mAssemblyState{};
 		VkPipelineRasterizationStateCreateInfo mRasterizationState{};
 		VkPipelineMultisampleStateCreateInfo mMultisampleState{};

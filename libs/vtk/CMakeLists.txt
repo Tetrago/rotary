@@ -3,6 +3,7 @@ project(vtk LANGUAGES CXX)
 
 set(VTK_HEADERS
 	"include/vtk/assert.hpp"
+	"include/vtk/buffer.hpp"
 	"include/vtk/command.hpp"
 	"include/vtk/extras.hpp"
 	"include/vtk/framebuffer.hpp"
@@ -14,9 +15,12 @@ set(VTK_HEADERS
 	"include/vtk/swapchain.hpp"
 	"include/vtk/render_pass.hpp"
 	"include/vtk/vtk.hpp"
+	"src/allocator.hpp"
 )
 
 set(VTK_SOURCES
+	"src/allocator.cpp"
+	"src/buffer.cpp"
 	"src/command.cpp"
 	"src/framebuffer.cpp"
 	"src/instance.cpp"
@@ -33,5 +37,5 @@ target_compile_features(vtk PUBLIC cxx_std_20)
 target_include_directories(vtk PUBLIC "include")
 target_link_libraries(vtk
 	PUBLIC Vulkan::Headers
-	PRIVATE Vulkan::Vulkan
+	PRIVATE Vulkan::Vulkan unofficial::vulkan-memory-allocator::vulkan-memory-allocator
 )

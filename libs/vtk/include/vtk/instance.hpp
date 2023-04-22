@@ -29,8 +29,6 @@ namespace vtk
 
 		Instance(const Instance&) = delete;
 		Instance& operator=(const Instance&) = delete;
-		Instance(Instance&&) = delete;
-		Instance& operator=(Instance&&) = delete;
 
 		operator VkInstance() const noexcept { return mHandle; }
 

@@ -17,8 +17,6 @@ namespace vtk
 
 		RenderPass(const RenderPass&) = delete;
 		RenderPass& operator=(const RenderPass&) = delete;
-		RenderPass(RenderPass&&) = delete;
-		RenderPass& operator=(RenderPass&&) = delete;
 
 		operator VkRenderPass() const noexcept { return mHandle; }
 	private:

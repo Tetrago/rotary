@@ -17,8 +17,6 @@ namespace vtk
 
 		Framebuffer(const Framebuffer&) = delete;
 		Framebuffer& operator=(const Framebuffer&) = delete;
-		Framebuffer(Framebuffer&&) = delete;
-		Framebuffer& operator=(Framebuffer&&) = delete;
 
 		operator VkFramebuffer() const noexcept { return mHandle; }
 	private:

@@ -5,6 +5,7 @@ set(ROTARY_HEADERS
 	"include/rotary/rotary.hpp"
 	"include/rotary/core/log.hpp"
 	"include/rotary/core/memory.hpp"
+	"include/rotary/graphics/mesh.hpp"
 	"include/rotary/graphics/graphics.hpp"
 	"include/rotary/graphics/shader.hpp"
 )
@@ -23,11 +24,13 @@ set(ROTARY_LIBRARIES
 
 if(ROTARY_VULKAN)
 	list(APPEND ROTARY_HEADERS
+		"src/vulkan/mesh.hpp"
 		"src/vulkan/graphics.hpp"
 		"src/vulkan/shader.hpp"
 	)
 
 	list(APPEND ROTARY_SOURCES
+		"src/vulkan/mesh.cpp"
 		"src/vulkan/graphics.cpp"
 		"src/vulkan/shader.cpp"
 	)

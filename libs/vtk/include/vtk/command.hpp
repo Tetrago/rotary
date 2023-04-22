@@ -17,8 +17,6 @@ namespace vtk
 
 		CommandPool(const CommandPool&) = delete;
 		CommandPool& operator=(const CommandPool&) = delete;
-		CommandPool(CommandPool&&) = delete;
-		CommandPool& operator=(CommandPool&&) = delete;
 
 		VkCommandBuffer create();
 		std::vector<VkCommandBuffer> create(int count);
