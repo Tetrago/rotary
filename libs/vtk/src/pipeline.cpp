@@ -1,7 +1,6 @@
 #include "vtk/pipeline.hpp"
 
 #include <stdexcept>
-#include <vulkan/vulkan_core.h>
 
 #include "vtk/assert.hpp"
 #include "vtk/logical_device.hpp"
@@ -124,14 +123,14 @@ namespace vtk
 		mBlendState.pAttachments = &mAttachmentState;
 	}
 
-	PipelineBuilder& PipelineBuilder::add(VkShaderStageFlagBits stage, std::span<uint8_t const> code) noexcept
+	PipelineBuilder& PipelineBuilder::add(VkShaderStageFlagBits stage, std::string_view entryPoint, std::span<uint8_t const> code) noexcept
 	{
 		mModules.push_back(code);
 
 		VkPipelineShaderStageCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		createInfo.stage = stage;
-		createInfo.pName = "main";
+		createInfo.pName = entryPoint.data();
 
 		mStages.push_back(createInfo);
 

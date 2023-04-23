@@ -3,6 +3,7 @@ project(rotary_workspace)
 
 find_package(argparse)
 find_package(glfw3)
+find_package(glslang)
 find_package(GTest)
 find_package(spdlog)
 find_package(spirv_cross_core)

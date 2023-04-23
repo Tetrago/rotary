@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <span>
+#include <string_view>
 #include <vector>
 #include <vulkan/vulkan.h>
 
@@ -37,7 +38,7 @@ namespace vtk
 	public:
 		PipelineBuilder(Ref<LogicalDevice> device, Ref<RenderPass> renderPass) noexcept;
 
-		PipelineBuilder& add(VkShaderStageFlagBits stage, std::span<uint8_t const> code) noexcept;
+		PipelineBuilder& add(VkShaderStageFlagBits stage, std::string_view entryPoint, std::span<uint8_t const> code) noexcept;
 		PipelineBuilder& begin() noexcept;
 		PipelineBuilder& input(VkFormat format, uint32_t offset) noexcept;
 		PipelineBuilder& end(size_t size) noexcept;

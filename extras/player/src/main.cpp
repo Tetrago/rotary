@@ -1,4 +1,3 @@
-#include "vtk/pipeline.hpp"
 #include <stdexcept>
 #include <plat/plat.hpp>
 #include <rotary/rotary.hpp>
@@ -16,7 +15,7 @@ int main()
 	};
 
 	rot::Ref<rot::Mesh> mesh = graphics->createMesh(data, 9 * sizeof(float));
-	rot::Ref<rot::Shader> shader = graphics->createShader("data/color.vert.spv", "data/color.frag.spv");
+	rot::Ref<rot::Shader> shader = graphics->createShader("data/color.hlsl");
 
 	bool running = true;
 	while(running)

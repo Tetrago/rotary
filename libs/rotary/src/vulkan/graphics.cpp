@@ -6,7 +6,7 @@
 #include <iterator>
 #include <ranges>
 #include <plat/vulkan.hpp>
-#include <vulkan/vulkan_core.h>
+#include <shcc/shcc.hpp>
 
 #include "rotary/core/log.hpp"
 #include "rotary/core/memory.hpp"
@@ -40,10 +40,20 @@ namespace rot
 
 			logger.log(level, "{}", message);
 		}
+
+		void shcc_callback(const std::string& message)
+		{
+			static Logger logger = LoggerBuilder("shcc")
+				.out()
+				.build();
+
+			logger.log(LogLevel::Error, "{}", message);
+		}
 	}
 
 	VulkanGraphics::VulkanGraphics(plat::Window* pWindow)
-		: mWindow(pWindow)
+		: mShcc(shcc::runtime(shcc_callback))
+		, mWindow(pWindow)
 	{
 		mInstance = vtk::InstanceBuilder()
 			.application("rotary", 0, 1, 0)
@@ -124,40 +134,72 @@ namespace rot
 		return mMeshes.emplace_back(make_ref<VulkanMesh>(mDevice, pData, size));
 	}
 
-	Ref<Shader> VulkanGraphics::createShader(const std::filesystem::path& vertex, const std::filesystem::path& fragment)
+	Ref<Shader> VulkanGraphics::createShader(const std::filesystem::path& path)
 	{
-		auto load = [](const std::filesystem::path& path)
+		std::ifstream file(path, std::ios::ate);
+		if(!file.is_open())
 		{
-			std::ifstream file(path, std::ios::ate | std::ios::binary);
-			if(!file.is_open())
-			{
-				logger().error("Could not find shader file `{}`", path.string());
-				throw std::runtime_error("Could not load file");
-			}
+			throw std::runtime_error("Could not open shader filer");
+		}
 
-			size_t size = file.tellg();
-			file.seekg(0, std::ios::beg);
+		size_t size = file.tellg();
+		file.seekg(0, std::ios::beg);
 
-			std::vector<uint8_t> data(size);
-			file.read(reinterpret_cast<char*>(data.data()), size);
+		std::string source(size, ' ');
+		file.read(source.data(), size);
 
-			return data;
-		};
+		shcc::Package package = mShcc->package(source, { shcc::Stage::Vertex, shcc::Stage::Fragment });
+		const shcc::Resources& resources = package.resources();
 
-		auto vcode = load(vertex);
-		auto fcode = load(fragment);
-
-		vtk::Ref<vtk::Pipeline> pipeline = vtk::PipelineBuilder(mDevice, mRenderPass)
-			.add(VK_SHADER_STAGE_VERTEX_BIT, vcode)
-			.add(VK_SHADER_STAGE_FRAGMENT_BIT, fcode)
+		auto vert = package.compile(shcc::Stage::Vertex, shcc::Language::Spirv);
+		auto frag = package.compile(shcc::Stage::Fragment, shcc::Language::Spirv);
+		
+		vtk::PipelineBuilder builder = vtk::PipelineBuilder(mDevice, mRenderPass)
+			.add(VK_SHADER_STAGE_VERTEX_BIT, shcc::get_entry_point(shcc::Stage::Vertex), vert)
+			.add(VK_SHADER_STAGE_FRAGMENT_BIT, shcc::get_entry_point(shcc::Stage::Fragment), frag)
 			.viewport(mSwapchain->extent())
-			.scissor(mSwapchain->extent())
-			.begin()
-			.input(VK_FORMAT_R32G32B32_SFLOAT, 0)
-			.end(3 * sizeof(float))
-			.build();
+			.scissor(mSwapchain->extent());
 
-		return mShaders.emplace_back(make_ref<VulkanShader>(std::move(pipeline)));
+		builder.begin();
+		size_t offset = 0;
+
+		for(const shcc::VertexInput& input : resources.vertexInputs)
+		{
+			VkFormat format = [&input]()
+			{
+				if(input.count < 1 || input.count > 4)
+					throw std::runtime_error("Vertex input count not supported");
+
+				switch(input.type)
+				{
+				default:
+					throw std::runtime_error("Vertex input format not supported");
+				case shcc::DataType::Float:
+					switch(input.count)
+					{
+					case 1: return VK_FORMAT_R32_SFLOAT;
+					case 2: return VK_FORMAT_R32G32_SFLOAT;
+					case 3: return VK_FORMAT_R32G32B32_SFLOAT;
+					case 4: return VK_FORMAT_R32G32B32A32_SFLOAT;
+					};
+				case shcc::DataType::Int:
+					switch(input.count)
+					{
+					case 1: return VK_FORMAT_R32_SINT;
+					case 2: return VK_FORMAT_R32G32_SINT;
+					case 3: return VK_FORMAT_R32G32B32_SINT;
+					case 4: return VK_FORMAT_R32G32B32A32_SINT;
+					};
+				}
+			}();
+
+			builder.input(format, offset);
+			offset += shcc::get_size_of(input.type) * input.count;
+		}
+
+		builder.end(offset);
+
+		return mShaders.emplace_back(make_ref<VulkanShader>(builder.build()));
 	}
 
 	void VulkanGraphics::begin()

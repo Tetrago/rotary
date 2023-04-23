@@ -13,4 +13,12 @@ add_library(shcc STATIC ${SHCC_HEADERS} ${SHCC_SOURCES})
 
 target_compile_features(shcc PUBLIC cxx_std_20)
 target_include_directories(shcc PUBLIC "include")
-target_link_libraries(shcc PRIVATE spirv-cross-core spirv-cross-glsl spirv-cross-reflect)
+target_link_libraries(shcc PRIVATE
+	glslang::glslang
+	glslang::glslang-default-resource-limits
+	glslang::SPIRV
+	glslang::HLSL
+	spirv-cross-core
+	spirv-cross-glsl
+	spirv-cross-reflect
+)

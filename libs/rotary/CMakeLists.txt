@@ -5,21 +5,27 @@ set(ROTARY_HEADERS
 	"include/rotary/rotary.hpp"
 	"include/rotary/core/log.hpp"
 	"include/rotary/core/memory.hpp"
+
 	"include/rotary/graphics/mesh.hpp"
 	"include/rotary/graphics/graphics.hpp"
 	"include/rotary/graphics/shader.hpp"
+
+	"include/rotary/io/file.hpp"
 )
 
 set(ROTARY_SOURCES
 	"src/core/log.cpp"
+
 	"src/graphics/graphics.cpp"
+
+	"src/io/file.cpp"
 )
 
 set(ROTARY_DEFINITIONS)
 
 set(ROTARY_LIBRARIES
 	PUBLIC spdlog::spdlog
-	PRIVATE plat
+	PRIVATE plat shcc
 )
 
 if(ROTARY_VULKAN)

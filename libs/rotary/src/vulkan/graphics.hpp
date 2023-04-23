@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <shcc/shcc.hpp>
 #include <vtk/vtk.hpp>
 
 #include "rotary/graphics/graphics.hpp"
@@ -18,7 +19,7 @@ namespace rot
 		VulkanGraphics& operator=(const VulkanGraphics&) = delete;
 
 		Ref<Mesh> createMesh(const void* pData, size_t size) override;
-		Ref<Shader> createShader(const std::filesystem::path& vertex, const std::filesystem::path& fragment) override;
+		Ref<Shader> createShader(const std::filesystem::path& path) override;
 
 		void begin() override;
 		void end() override;
@@ -28,6 +29,7 @@ namespace rot
 
 		void draw(uint32_t count, uint32_t offset) override;
 	private:
+		std::shared_ptr<shcc::Runtime> mShcc;
 		plat::Window* mWindow;
 		vtk::Ref<vtk::Instance> mInstance;
 		VkSurfaceKHR mSurface;
