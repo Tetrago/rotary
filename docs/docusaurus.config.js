@@ -77,7 +77,7 @@ const config = {
             items: [
               {
                 label: 'Project Structure',
-                to: '/docs/project-structure',
+                to: '/docs/intro',
               },
             ],
           },
