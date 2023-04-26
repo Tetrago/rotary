@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+slug: /
 ---
 
 # Intro
@@ -44,6 +45,14 @@ flowchart TD
     shcc --- glslang & spirv_cross
     uitk --- imgui
     vtk --- vulkan_headers & vulkan
+
+    click player "./extras/player"
+    click shaderx "./extras/shaderx"
+
+    click engine "./engine"
+    click plat "./libs/plat"
+    click shcc "./libs/shcc"
+    click vtk "./libs/vtk"
 
     click bullet "https://github.com/bulletphysics/bullet3" _blank
     click imgui "https://github.com/ocornut/imgui" _blank

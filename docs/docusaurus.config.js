@@ -41,6 +41,7 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/tetrago/rotary/tree/develop/docs/',
+          routeBasePath: '/'
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -61,12 +62,6 @@ const config = {
           src: 'img/logo.svg',
         },
         items: [
-          {
-            type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
-            position: 'left',
-            label: 'Documentation',
-          },
         ],
       },
       footer: {
@@ -76,9 +71,17 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Project Structure',
-                to: '/docs/intro',
+                label: 'Engine',
+                to: '/engine',
               },
+              {
+                label: 'Libraries',
+                to: '/libs'
+              },
+              {
+                label: 'Extras',
+                to: '/extras'
+              }
             ],
           },
           {
