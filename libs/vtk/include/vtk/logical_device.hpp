@@ -30,9 +30,6 @@ namespace vtk
 
 		operator VkDevice() const noexcept { return mHandle; }
 
-		Holder<VkFence> createFence(bool signaled = false) const;
-		Holder<VkSemaphore> createSemaphore() const;
-
 		const Instance& instance() const noexcept { return *mInstance; }
 		const PhysicalDevice& physicalDevice() const noexcept { return mPhysicalDevice; }
 		VkQueue queue(QueueType type) const noexcept { return mQueues.at(type).second; }

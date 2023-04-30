@@ -105,9 +105,9 @@ namespace rot
 
 		mCommandBuffer = mCommandPool->create();
 
-		mPresentSemaphore = mDevice->createSemaphore();
-		mRenderSemaphore = mDevice->createSemaphore();
-		mRenderFence = mDevice->createFence(true);
+		mPresentSemaphore = vtk::create_semaphore(*mDevice);
+		mRenderSemaphore = vtk::create_semaphore(*mDevice);
+		mRenderFence = vtk::create_fence(*mDevice, true);
 	}
 
 	VulkanGraphics::~VulkanGraphics() noexcept

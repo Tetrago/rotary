@@ -1,6 +1,5 @@
 #pragma once
 
-#include <span>
 #include <filesystem>
 #include <glm/glm.hpp>
 #include <plat/plat.hpp>

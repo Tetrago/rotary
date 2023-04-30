@@ -13,7 +13,7 @@
 
 namespace plat
 {
-	std::vector<std::string_view> get_required_instance_extensions() noexcept
+	std::vector<std::string_view const> get_required_instance_extensions() noexcept
 	{
 		uint32_t count;
 		const char** names = glfwGetRequiredInstanceExtensions(&count);
