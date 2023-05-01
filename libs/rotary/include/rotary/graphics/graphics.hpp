@@ -1,7 +1,6 @@
 #pragma once
 
 #include <filesystem>
-#include <glm/glm.hpp>
 #include <plat/plat.hpp>
 
 #include "rotary/core/memory.hpp"
