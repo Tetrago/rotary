@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <plat/plat.hpp>
 
+#include "rotary/core/base.hpp"
 #include "rotary/core/memory.hpp"
 
 namespace rot
@@ -10,7 +11,7 @@ namespace rot
 	class Mesh;
 	class Shader;
 
-	class Graphics
+	class ROTARY_API Graphics
 	{
 	public:
 		virtual ~Graphics() noexcept = default;

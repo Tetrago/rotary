@@ -21,7 +21,7 @@ set(ROTARY_SOURCES
 	"src/io/file.cpp"
 )
 
-set(ROTARY_DEFINITIONS)
+set(ROTARY_DEFINITIONS PRIVATE ROTARY_BUILD)
 
 set(ROTARY_LIBRARIES
 	PUBLIC spdlog::spdlog
@@ -48,7 +48,13 @@ if(ROTARY_VULKAN)
 	)
 endif()
 
-add_library(rotary STATIC ${ROTARY_HEADERS} ${ROTARY_SOURCES})
+if(ROTARY_SHARED_LIBS)
+	add_library(rotary SHARED ${ROTARY_HEADERS} ${ROTARY_SOURCES})
+
+	list(APPEND ROTARY_DEFINITIONS PUBLIC ROTARY_SHARED)
+else()
+	add_library(rotary STATIC ${ROTARY_HEADERS} ${ROTARY_SOURCES})
+endif()
 
 target_compile_features(rotary PUBLIC cxx_std_20)
 target_compile_definitions(rotary ${ROTARY_DEFINITIONS})

@@ -1,8 +1,10 @@
 #pragma once
 
+#include "rotary/core/base.hpp"
+
 namespace rot
 {
-	class Mesh
+	class ROTARY_API Mesh
 	{
 	public:
 		virtual ~Mesh() noexcept = default;

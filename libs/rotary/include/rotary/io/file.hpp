@@ -4,7 +4,9 @@
 #include <filesystem>
 #include <vector>
 
+#include "rotary/core/base.hpp"
+
 namespace rot
 {
-	std::vector<uint8_t> load_binary_file(const std::filesystem::path& path);
+	ROTARY_API std::vector<uint8_t> load_binary_file(const std::filesystem::path& path);
 }    

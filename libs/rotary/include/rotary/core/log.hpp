@@ -5,6 +5,8 @@
 #include <memory>
 #include <spdlog/spdlog.h>
 
+#include "base.hpp"
+
 namespace rot
 {
 	enum class LogLevel
@@ -15,7 +17,7 @@ namespace rot
 		Error = spdlog::level::err
 	};
 
-	class Logger
+	class ROTARY_API Logger
 	{
 		friend class LoggerBuilder;
 	public:
@@ -43,7 +45,7 @@ namespace rot
 		std::shared_ptr<spdlog::logger> mLogger;
 	};
 
-	class LoggerBuilder
+	class ROTARY_API LoggerBuilder
 	{
 		friend class Logger;
 	public:
@@ -58,5 +60,5 @@ namespace rot
 		std::vector<spdlog::sink_ptr> mSinks;
 	};
 
-	const Logger& logger() noexcept;
+	ROTARY_API const Logger& logger() noexcept;
 }    

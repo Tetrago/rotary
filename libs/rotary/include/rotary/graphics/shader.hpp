@@ -1,8 +1,10 @@
 #pragma once
 
+#include "rotary/core/base.hpp"
+
 namespace rot
 {
-	class Shader
+	class ROTARY_API Shader
 	{
 	public:
 		virtual ~Shader() noexcept = default;

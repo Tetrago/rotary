@@ -13,6 +13,7 @@ find_package(Vulkan)
 find_package(unofficial-vulkan-memory-allocator)
 
 option(ROTARY_VULKAN "" ON)
+option(ROTARY_SHARED_LIBS "" ON)
 
 add_subdirectory("libs/plat")
 add_subdirectory("libs/shcc")
