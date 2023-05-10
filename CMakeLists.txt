@@ -22,4 +22,9 @@ add_subdirectory("libs/rotary")
 add_subdirectory("extras/player")
 add_subdirectory("extras/shaderx")
 
-add_subdirectory("tests")
+option(ROTARY_TESTS "" ON)
+if(ROTARY_TESTS)
+	enable_testing()
+
+	add_subdirectory("tests")
+endif()

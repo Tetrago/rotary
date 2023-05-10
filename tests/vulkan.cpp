@@ -1,3 +1,4 @@
+#include "vtk/extras.hpp"
 #include <stack>
 #include <string>
 #include <ranges>
@@ -65,8 +66,8 @@ TEST(Vulkan, Lifecycle)
 		.index(device->queueIndex(vtk::QueueType::Graphics))
 		.build();
 
-	vtk::Holder<VkSemaphore> semaphore = device->createSemaphore();
-	vtk::Holder<VkFence> fence = device->createFence();
+	vtk::Holder<VkSemaphore> semaphore = vtk::create_semaphore(*device);
+	vtk::Holder<VkFence> fence = vtk::create_fence(*device);
 
 	fence.reset();
 	semaphore.reset();
