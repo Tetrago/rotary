@@ -73,6 +73,10 @@ flowchart TD
     style imgui fill:#f96
 ```
 
+:::note
+The Platform Toolkit library is modularized and contains multiple, some independent, libraries.
+:::
+
 ## Directory Structure
 
 ```mermaid
