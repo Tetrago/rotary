@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <shcc/shcc.hpp>
+#include <plat/plat.hpp>
 #include <vtk/vtk.hpp>
 
 #include "rotary/graphics/graphics.hpp"
@@ -19,7 +20,7 @@ namespace rot
 		VulkanGraphics& operator=(const VulkanGraphics&) = delete;
 
 		Ref<Mesh> createMesh(const void* pData, size_t size) override;
-		Ref<Shader> createShader(const std::filesystem::path& path) override;
+		Ref<Shader> createShader(const plat::Path& path) override;
 
 		void begin() override;
 		void end() override;

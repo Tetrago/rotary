@@ -134,19 +134,9 @@ namespace rot
 		return mMeshes.emplace_back(make_ref<VulkanMesh>(mDevice, pData, size));
 	}
 
-	Ref<Shader> VulkanGraphics::createShader(const std::filesystem::path& path)
+	Ref<Shader> VulkanGraphics::createShader(const plat::Path& path)
 	{
-		std::ifstream file(path, std::ios::ate);
-		if(!file.is_open())
-		{
-			throw std::runtime_error("Could not open shader filer");
-		}
-
-		size_t size = file.tellg();
-		file.seekg(0, std::ios::beg);
-
-		std::string source(size, ' ');
-		file.read(source.data(), size);
+		std::string source = plat::read_file(path);
 
 		shcc::Package package = mShcc->package(source, { shcc::Stage::Vertex, shcc::Stage::Fragment });
 		const shcc::Resources& resources = package.resources();
