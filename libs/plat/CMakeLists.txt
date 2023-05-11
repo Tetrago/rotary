@@ -1,32 +1,36 @@
 cmake_minimum_required(VERSION 3.8)
 project(plat LANGUAGES CXX)
 
-set(PLAT_HEADERS
-	"include/plat/plat.hpp"
-	"include/plat/filesystem.hpp"
-	"include/plat/window.hpp"
-)
+function(plat_module)
+	cmake_parse_arguments(
+		ARGV
+		""
+		"NAME"
+		"LIBRARIES;DEFINITIONS"
+		${ARGN}
+	)
 
-set(PLAT_SOURCES
-	"src/filesystem.cpp"
-	"src/window.cpp"
-)
+	string(TOUPPER ${ARGV_NAME} OPT)
 
-set(PLAT_LIBRARIES
-	PRIVATE glfw
-)
+	option(${OPT} "" ON)
+	if(${OPT})
+		set(LIB plat-${ARGV_NAME})
 
-set(PLAT_DEFINITIONS)
+		add_library(${LIB} STATIC "include/plat/${ARGV_NAME}.hpp" "src/${ARGV_NAME}.cpp")
 
-if(ROTARY_VULKAN)
-	list(APPEND PLAT_SOURCES "src/vulkan.cpp")
-	list(APPEND PLAT_LIBRARIES PUBLIC Vulkan::Headers)
-	list(APPEND PLAT_DEFINITIONS PUBLIC PLAT_VULKAN)
-endif()
+		target_compile_features(${LIB} PUBLIC cxx_std_20)
+		target_include_directories(${LIB} PUBLIC "include")
 
-add_library(plat STATIC ${PLAT_HEADERS} ${PLAT_SOURCES})
+		if(DEFINED ARGV_LIBRARIES)
+			target_link_libraries(${LIB} ${ARGV_LIBRARIES})
+		endif()
 
-target_compile_features(plat PUBLIC cxx_std_20)
-target_include_directories(plat PUBLIC "include")
-target_link_libraries(plat ${PLAT_LIBRARIES})
-target_compile_definitions(plat ${PLAT_DEFINITIONS})
+		if(DEFINED ARGV_DEFINITIONS)
+			target_compile_definitions(${LIB} ${ARGV_DEFINITIONS})
+		endif()
+	endif()
+endfunction()
+
+plat_module(NAME window LIBRARIES PRIVATE glfw)
+plat_module(NAME vulkan LIBRARIES PUBLIC Vulkan::Headers PRIVATE plat-window glfw)
+plat_module(NAME filesystem)

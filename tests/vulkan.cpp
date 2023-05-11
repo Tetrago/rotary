@@ -1,4 +1,3 @@
-#include "vtk/extras.hpp"
 #include <stack>
 #include <string>
 #include <ranges>
@@ -6,7 +5,7 @@
 #include <iterator>
 
 #include <gtest/gtest.h>
-#include <plat/plat.hpp>
+#include <plat/window.hpp>
 #include <plat/vulkan.hpp>
 #include <vtk/vtk.hpp>
 

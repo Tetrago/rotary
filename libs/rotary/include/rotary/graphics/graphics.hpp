@@ -1,7 +1,8 @@
 #pragma once
 
 #include <filesystem>
-#include <plat/plat.hpp>
+#include <plat/filesystem.hpp>
+#include <plat/window.hpp>
 
 #include "rotary/core/base.hpp"
 #include "rotary/core/memory.hpp"
@@ -20,7 +21,7 @@ namespace rot
 		Graphics& operator=(const Graphics&) = delete;
 
 		virtual Ref<Mesh> createMesh(const void* pData, size_t size) = 0;
-		virtual Ref<Shader> createShader(const std::filesystem::path& path) = 0;
+		virtual Ref<Shader> createShader(const plat::Path& path) = 0;
 
 		virtual void begin() = 0;
 		virtual void end() = 0;

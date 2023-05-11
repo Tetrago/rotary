@@ -1,0 +1,6 @@
+type: text
+exports:
+  hlsl:
+  spv:
+    exporter: shcc
+    args: spv

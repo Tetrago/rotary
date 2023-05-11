@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <vector>
 #include <shcc/shcc.hpp>
-#include <plat/plat.hpp>
 #include <vtk/vtk.hpp>
 
 #include "rotary/graphics/graphics.hpp"

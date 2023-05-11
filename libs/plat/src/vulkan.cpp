@@ -1,10 +1,12 @@
-#include "plat/window.hpp"
+#include "plat/vulkan.hpp"
 
 #include <stdexcept>
 #include <span>
 #include <algorithm>
 #include <iterator>
 #include <ranges>
+
+#include "plat/window.hpp"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>

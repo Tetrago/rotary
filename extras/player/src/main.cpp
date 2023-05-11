@@ -1,5 +1,5 @@
 #include <stdexcept>
-#include <plat/plat.hpp>
+#include <plat/window.hpp>
 #include <rotary/rotary.hpp>
 #include <vtk/vtk.hpp>
 

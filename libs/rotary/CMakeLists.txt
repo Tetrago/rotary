@@ -25,7 +25,7 @@ set(ROTARY_DEFINITIONS PRIVATE ROTARY_BUILD)
 
 set(ROTARY_LIBRARIES
 	PUBLIC spdlog::spdlog
-	PRIVATE plat shcc
+	PRIVATE plat-window plat-filesystem shcc
 )
 
 if(ROTARY_VULKAN)
@@ -44,7 +44,7 @@ if(ROTARY_VULKAN)
 	list(APPEND ROTARY_DEFINITIONS PRIVATE ROTARY_VULKAN)
 
 	list(APPEND ROTARY_LIBRARIES
-		PRIVATE vtk
+		PRIVATE vtk plat-vulkan
 	)
 endif()
 
