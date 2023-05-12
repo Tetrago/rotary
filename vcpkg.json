@@ -6,6 +6,7 @@
 		"gtest",
 		"spdlog",
 		"spirv-cross",
-		"vulkan-memory-allocator"
+		"vulkan-memory-allocator",
+		"yaml-cpp"
 	]
 }

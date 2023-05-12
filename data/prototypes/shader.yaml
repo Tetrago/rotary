@@ -1,6 +1,11 @@
+version: 0
 type: text
-exports:
+ext: hlsl
+props:
+  stages: [vert, frag]
+export:
   hlsl:
   spv:
-    exporter: shcc
-    args: spv
+    type: package
+    generator: shcc
+    mode: spv
